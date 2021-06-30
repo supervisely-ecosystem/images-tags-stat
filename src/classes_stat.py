@@ -21,6 +21,7 @@ TAGS = 'Tags'
 
 TOTAL = 'TOTAL NUMBER OF TAGS'
 TOTAL_COL = 'TOTAL'
+PROJECT_COL = 'PROJECT'
 COUNT_SUFFIX = '_cnt'
 TAG_COLOMN = 'tag'
 TAG_VALUE_COLOMN = 'tag_value'
@@ -54,40 +55,85 @@ def get_pd_tag_stat_1(meta, datasets, columns):
 
 def process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls):
     for tag in curr_image_tags:
-         # ds_tags_to_imgs_urls[tag.name].append(
-         #     '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url,
-         #                                                                              image_info.name))
-
         ds_tags_to_imgs_urls[tag.name].append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                          .format(image_info.full_storage_url, image_info.name))
 
 
 def get_pd_tag_stat_2(meta, datasets, columns):
     data = []
-    for idx, tag_meta in enumerate(meta.tag_metas):
+    idx = 0
+    for tag_meta in meta.tag_metas:
         name = tag_meta.name
-        row = [idx, name]
-        row.append([])
-        for ds_name, ds_property_tags in datasets:
-            row.append([])
-            for curr_data in ds_property_tags[name]:
-                if curr_data not in row:
-                    row[-1].append(curr_data)
 
-            if len(ds_property_tags[name]) > 0:
-                for curr_data in ds_property_tags[name]:
-                    if curr_data not in row[2]:
-                        row[2].append(curr_data)
-        data.append(row)
+        all_ds_rows = ['' for _ in datasets]
+
+        for ds_index, (ds_name, ds_property_tags) in enumerate(datasets):
+            for curr_link in ds_property_tags[name]:
+                row = [idx, name]
+                row.append(curr_link)
+                row.extend(all_ds_rows)
+                row[3 + ds_index] = curr_link
+                idx += 1
+                data.append(row)
+
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+
+def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals):
+    for tag in curr_image_tags:
+        if tag.value not in tags_to_vals[tag.name]:
+            tags_to_vals[tag.name].append(tag.value)
+        ds_images_tags_vals_3[tag.name][tag.value] += 1
+
+
+def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
+
+    data = []
+
+    for idx, tag_name in enumerate(tags_to_vals):
+        for tag_val in tags_to_vals[tag_name]:
+            row = [idx, tag_name, tag_val]
+            row.extend([0])
+            for ds_name, ds_property_tags in datasets:
+                row.extend([ds_property_tags[tag_name][tag_val]])
+                row[3] += ds_property_tags[tag_name][tag_val]
+            data.append(row)
 
     df = pd.DataFrame(data, columns=columns)
     total_row = list(df.sum(axis=0))
     total_row[0] = len(df)
     total_row[1] = TOTAL
-    for curr_row in range(2, len(total_row)):
-        total_row[curr_row] = set(total_row[curr_row])
+    total_row.insert(2, '')
     df.loc[len(df)] = total_row
 
+    return df
+
+
+def process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4):
+    for tag in curr_image_tags:
+        ds_tags_to_imgs_urls_4[tag.name][tag.value].append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
+                                              .format(image_info.full_storage_url, image_info.name))
+
+
+def get_pd_tag_stat_4(datasets, columns, tags_to_vals):
+    data = []
+    idx = 0
+    for tag_name in tags_to_vals:
+        for tag_val in tags_to_vals[tag_name]:
+
+            all_ds_rows = ['' for _ in datasets]
+
+            for ds_index, (ds_name, ds_property_tags) in enumerate(datasets):
+                for curr_link in ds_property_tags[tag_name][tag_val]:
+                    row = [idx, tag_name, tag_val]
+                    row.append(curr_link)
+                    row.extend(all_ds_rows)
+                    row[4 + ds_index] = curr_link
+                    idx += 1
+                    data.append(row)
+
+    df = pd.DataFrame(data, columns=columns)
     return df
 
 
@@ -103,46 +149,67 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         app_logger.warn("Project {!r} have no tags".format(project_info.name))
         my_app.stop()
 
-    columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN]
-    columns_images_tags_1.extend([TOTAL_COL])
+    columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
     datasets_counts_1 = []
-    #==========================================================================================
-    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN]
-    columns_images_tags_2.extend([TOTAL_COL])
+    #========================================================================================== 2 ====
+    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
     datasets_counts_2 = []
-    # ==========================================================================================
+
+    # ========================================================================================== 3 ====
+    columns_images_tags_3 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
+    datasets_counts_3 = []
+    tags_to_vals = defaultdict(list)
+    # =========================================================================================== 4 ====
+    columns_images_tags_vals_4 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
+    datasets_counts_4 = []
+
+
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
 
     for dataset in api.dataset.get_list(PROJECT_ID):
-        columns_images_tags_1.extend([dataset.name]) # 1
-        ds_images_tags_1 = defaultdict(int)          # 1
+        columns_images_tags_1.extend([dataset.name])                            # 1
+        ds_images_tags_1 = defaultdict(int)                                     # 1
 
-        columns_images_tags_2.extend([dataset.name])   # 2
-        ds_tags_to_imgs_urls = defaultdict(list)       # 2
+        columns_images_tags_2.extend([dataset.name])                            # 2
+        ds_tags_to_imgs_urls_2 = defaultdict(list)                              # 2
 
+        columns_images_tags_3.extend([dataset.name])                            # 3
+        ds_images_tags_vals_3 = defaultdict(lambda: defaultdict(int))           # 3
+
+        columns_images_tags_vals_4.extend([dataset.name])                       # 4
+        ds_tags_to_imgs_urls_4 = defaultdict(lambda: defaultdict(list))         # 4
 
         images = api.image.get_list(dataset.id)
 
         for batch in sly.batched(images, batch_size=10):
             for image_info in batch:
                 curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
-                process_images_tags_1(curr_image_tags, ds_images_tags_1)                       # 1
-
+                process_images_tags_1(curr_image_tags, ds_images_tags_1)                            # 1
                 #url = api.image.url(TEAM_ID, WORKSPACE_ID, PROJECT_ID, dataset.id, image_info.id)
+                process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls_2)          # 2
 
-                process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls)       # 2
+                process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals)         # 3
+
+                process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4)          # 4
 
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))                       # 1
-
-        datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls))                       # 2
+        datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                 # 2
+        datasets_counts_3.append((dataset.name, ds_images_tags_vals_3))                  # 3
+        datasets_counts_4.append((dataset.name, ds_tags_to_imgs_urls_4))                 # 4
 
     df_1 = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)                       # 1
-    print(df_1)                                                                                   # 1
+    print(df_1)                                                                                    # 1
 
-    df_2 = get_pd_tag_stat_2(meta, datasets_counts_2, columns_images_tags_2)
-    print(df_2)
+    df_2 = get_pd_tag_stat_2(meta, datasets_counts_2, columns_images_tags_2)                       # 2
+    print(df_2)                                                                                    # 2
+
+    df_3 = get_pd_tag_stat_3(datasets_counts_3, columns_images_tags_3, tags_to_vals)               # 3
+    print(df_3)                                                                                    # 3
+
+    df_4 = get_pd_tag_stat_4(datasets_counts_4, columns_images_tags_vals_4, tags_to_vals)          # 4
+    print(df_4)                                                                                    # 4
 
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
@@ -160,6 +227,8 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
         {"field": "data.tags_to_imgs_urls_statTable", "payload": json.loads(df_2.to_json(orient="split"))},
+        {"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
+        {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_4.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},

@@ -1,8 +1,8 @@
 <div>
     <sly-card
             class="mt15"
-            title="Tags stat"
-            subtitle="Tags stat"
+            title="Images tags stats"
+            subtitle="Images tags stats"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -10,13 +10,12 @@
                 :content="data.imgs_tags_statTable"
         ></sly-table>
 
-
     </sly-card>
 
     <sly-card
             class="mt15"
-            title="Tags stat"
-            subtitle="Tags stat"
+            title="Images tags stats to imgs"
+            subtitle="Images tags stats to imgs"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -24,6 +23,31 @@
                 :content="data.tags_to_imgs_urls_statTable"
         ></sly-table>
 
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Images tags vals stats"
+            subtitle="Images tags vals stats"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.imgs_tags_vals_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Images tags values stats to imgs"
+            subtitle="Images tags values stats to imgs"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.tags_vals_to_imgs_urls_statTable"
+        ></sly-table>
 
     </sly-card>
 </div>
