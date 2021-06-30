@@ -1,0 +1,15 @@
+<div>
+    <sly-card
+            class="mt15"
+            title="Tags stat"
+            subtitle="Tags stat"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.imgs_tags_statTable"
+        ></sly-table>
+
+
+    </sly-card>
+</div>
