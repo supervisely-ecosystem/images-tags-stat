@@ -115,4 +115,17 @@
         ></sly-table>
 
     </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Images to obj tags and values"
+            subtitle="Images to obj tags and values"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.images_to_objs_tag_val_statTable"
+        ></sly-table>
+
+    </sly-card>
 </div>
