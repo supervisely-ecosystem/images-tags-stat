@@ -50,4 +50,69 @@
         ></sly-table>
 
     </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags stats"
+            subtitle="Objects tags stats"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.objs_tags_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags stats to imgs"
+            subtitle="Objects tags stats to imgs"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.obj_tags_to_imgs_urls_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags vals stats"
+            subtitle="Objects tags vals stats"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.objs_tags_vals_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags values stats to imgs"
+            subtitle="Objects tags values stats to imgs"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.obj_tags_vals_to_imgs_urls_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Images to imgs tags and values"
+            subtitle="Images to imgs tags and values"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.images_to_imgs_tag_val_statTable"
+        ></sly-table>
+
+    </sly-card>
 </div>
