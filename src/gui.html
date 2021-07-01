@@ -128,4 +128,30 @@
         ></sly-table>
 
     </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags to classes"
+            subtitle="Objects tags to classes"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.obj_tags_to_classes_statTable"
+        ></sly-table>
+
+    </sly-card>
+
+    <sly-card
+            class="mt15"
+            title="Objects tags vals to classes"
+            subtitle="Objects tags vals to classes"
+    >
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.obj_tags_vals_to_classes_statTable"
+        ></sly-table>
+
+    </sly-card>
 </div>

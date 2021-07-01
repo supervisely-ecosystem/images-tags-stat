@@ -22,6 +22,7 @@ PROJECT_COL = 'PROJECT'
 IMAGE_COL = 'IMAGE NAME'
 DATASET_NAME = 'DATASET NAME'
 NUM_OBJECTS = 'NUMBER OF OBJECTS'
+OBJECT_CLASS = 'OBJECT CLASS'
 COUNT_SUFFIX = '_cnt'
 TAG_COLOMN = 'tag'
 TAG_VALUE_COLOMN = 'tag_value'
@@ -296,6 +297,64 @@ def get_pd_tag_stat_10(datasets, columns):
     return df
 
 
+def process_obj_tags_to_class_11(ann, obj_tags_to_class_11):
+    for label in ann.labels:
+        for tag in label.tags:
+            obj_tags_to_class_11[tag.name][label.obj_class.name] += 1
+
+
+def get_pd_tag_stat_11(meta, datasets, columns):
+    data = []
+    idx = 0
+    all_ds_rows = ['' for _ in datasets]
+    for tag_meta in meta.tag_metas:
+        tag_name = tag_meta.name
+        for obj_class in meta.obj_classes:
+            row = [idx, tag_name, obj_class.name, 0]
+            row.extend(all_ds_rows)
+
+            for ds_index, (dataset_name, tags_to_classes) in enumerate(datasets):
+                row[3] += tags_to_classes[tag_name][obj_class.name]
+                row[4 + ds_index] = tags_to_classes[tag_name][obj_class.name]
+
+            if row[3] == 0:
+                continue
+            idx += 1
+            data.append(row)
+
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+
+def process_obj_tags_to_class_12(ann, obj_tags_to_class_12):
+    for label in ann.labels:
+        for tag in label.tags:
+            obj_tags_to_class_12[tag.name][tag.value][label.obj_class.name] += 1
+
+
+def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
+    data = []
+    idx = 0
+    all_ds_rows = ['' for _ in datasets]
+    for tag_meta in meta.tag_metas:
+        tag_name = tag_meta.name
+        for tag_val in obj_tags_to_vals[tag_name]:
+            for obj_class in meta.obj_classes:
+                row = [idx, tag_name, tag_val, obj_class.name, 0]
+                row.extend(all_ds_rows)
+                for ds_index, (dataset_name, tags_to_classes) in enumerate(datasets):
+                    row[4] += tags_to_classes[tag_name][tag_val][obj_class.name]
+                    row[5 + ds_index] = tags_to_classes[tag_name][tag_val][obj_class.name]
+
+                if row[4] == 0:
+                    continue
+                idx += 1
+                data.append(row)
+
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+
 @my_app.callback("images_tags_stats")
 @sly.timeit
 def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
@@ -337,10 +396,15 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     # =========================================================================================== 9 ====
     columns_images_urls_to_img_tags_9 = [FIRST_STRING, IMAGE_COL, DATASET_NAME, TAG_COLOMN, TAG_VALUE_COLOMN]
     datasets_counts_9 = []
-
     # =========================================================================================== 10 ====
     columns_images_urls_to_obj_tags_10 = [FIRST_STRING, IMAGE_COL, DATASET_NAME, TAG_COLOMN, TAG_VALUE_COLOMN, NUM_OBJECTS]
     datasets_counts_10 = []
+    # =========================================================================================== 11 ====
+    columns_objects_tags_11 = [FIRST_STRING, TAG_COLOMN, OBJECT_CLASS, PROJECT_COL]
+    datasets_counts_11 = []
+    # =========================================================================================== 12 ====
+    columns_objects_tags_12 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, OBJECT_CLASS, PROJECT_COL]
+    datasets_counts_12 = []
 
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
@@ -373,6 +437,12 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         imgs_urls_to_img_tags_9 = defaultdict(lambda: defaultdict(list))                            # 9
         imgs_urls_to_obj_tags_10 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))       # 10
 
+        columns_objects_tags_11.extend([dataset.name])                                              # 11
+        obj_tags_to_class_11 = defaultdict(lambda: defaultdict(int))                                # 11
+
+        columns_objects_tags_12.extend([dataset.name])                                              # 12
+        obj_tags_to_class_12 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))           # 12
+
         images = api.image.get_list(dataset.id)
 
         for batch in sly.batched(images, batch_size=10):
@@ -398,6 +468,9 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
                 process_objects_tags_8(curr_object_tags, batch[idx], ds_tags_to_imgs_urls_8)         # 8
                 process_images_urls_to_obj_tags_10(curr_object_tags, batch[idx], imgs_urls_to_obj_tags_10)  # 10
 
+                process_obj_tags_to_class_11(ann, obj_tags_to_class_11)                              # 11
+                process_obj_tags_to_class_12(ann, obj_tags_to_class_12)                              # 12
+
         datasets_counts_1.append((dataset.name, ds_images_tags_1))                       # 1
         datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                 # 2
         datasets_counts_3.append((dataset.name, ds_images_tags_vals_3))                  # 3
@@ -408,6 +481,8 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         datasets_counts_8.append((dataset.name, ds_tags_to_imgs_urls_8))                 # 8
         datasets_counts_9.append((dataset.name, imgs_urls_to_img_tags_9))                # 9
         datasets_counts_10.append((dataset.name, imgs_urls_to_obj_tags_10))              # 10
+        datasets_counts_11.append((dataset.name, obj_tags_to_class_11))                  # 11
+        datasets_counts_12.append((dataset.name, obj_tags_to_class_12))                  # 12
 
     df_1 = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)                       # 1
     print(df_1)                                                                                    # 1
@@ -439,6 +514,12 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     df_10 = get_pd_tag_stat_10(datasets_counts_10, columns_images_urls_to_obj_tags_10)             # 10
     print(df_10)
 
+    df_11 = get_pd_tag_stat_11(meta, datasets_counts_11, columns_objects_tags_11)                  # 11
+    print(df_11)
+
+    df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals) # 12
+    print(df_12)
+
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -463,6 +544,8 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_8.to_json(orient="split"))},
         {"field": "data.images_to_imgs_tag_val_statTable", "payload": json.loads(df_9.to_json(orient="split"))},
         {"field": "data.images_to_objs_tag_val_statTable", "payload": json.loads(df_10.to_json(orient="split"))},
+        {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))},
+        {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
