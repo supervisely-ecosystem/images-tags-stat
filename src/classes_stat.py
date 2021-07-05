@@ -363,6 +363,24 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
+    #=====================my_test_select============================================================
+
+    project_tags = []
+    for tag in meta.tag_metas:
+        project_tags.append({"value": tag.name, "label": tag.name})
+
+    fields = [
+        {"field": "data.loading", "payload": False},
+        {"field": "state.options", "payload": project_tags}
+    ]
+
+    api.task.set_fields(task_id, fields)
+
+    a=0
+
+
+    # =====================my_test_select============================================================
+
     if len(meta.tag_metas) == 0:
         app_logger.warn("Project {!r} have no tags".format(project_info.name))
         my_app.stop()

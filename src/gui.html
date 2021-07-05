@@ -1,4 +1,27 @@
 <div>
+
+    <sly-card
+            class="mt15"
+            title="My test select"
+            subtitle="My test select"
+    >
+
+        <div>
+          <el-select v-model="state.value5" multiple placeholder="Select">
+            <el-option
+              v-for="item in state.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+            <el-button v-loading="state.loading" class="regular" type="primary"
+            @click="command('create_table')">Run</el-button>
+        </div>
+
+    </sly-card>
+
+
     <sly-card
             class="mt15"
             title="Images tags stats"
