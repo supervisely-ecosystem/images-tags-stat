@@ -27,6 +27,7 @@ COUNT_SUFFIX = '_cnt'
 TAG_COLOMN = 'tag'
 TAG_VALUE_COLOMN = 'tag_value'
 FIRST_STRING = '#'
+logger = my_app.logger
 
 
 def process_images_tags_1(curr_image_tags, ds_images_tags_1):
@@ -365,6 +366,7 @@ def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
+    logger.warn('start my_test_select, state = {}'.format(state))
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
