@@ -10,7 +10,9 @@
           <el-select v-model="state.value5" multiple placeholder="Select">
             <el-option
               v-for="item in state.options"
-              :key="item.value">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
             <el-button v-loading="state.loading" class="regular" type="primary"

@@ -357,8 +357,14 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 
 
 def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
+
+    choose_tags = []
+    for curr_data in state['options']:
+        choose_tags.append(curr_data['value'])
+
+    logger.warn('Choose tags: {}'.format(choose_tags))
     for tag in curr_image_tags:
-        if tag.name in state:
+        if tag.name in choose_tags:
             ds_images_tags_1[tag.name] += 1
 
 
@@ -405,7 +411,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_test.to_json(orient="split"))},
+        {"field": "data.test_selectTable", "payload": json.loads(df_test.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
