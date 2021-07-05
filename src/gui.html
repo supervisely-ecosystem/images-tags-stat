@@ -16,8 +16,14 @@
             </el-option>
           </el-select>
             <el-button v-loading="state.loading" class="regular" type="primary"
-            @click="command('create_table')">Run</el-button>
+            @click="command('my_test_select')">Run</el-button>
         </div>
+
+        <sly-table
+                v-loading="data.imgs_tags_stat"
+                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
+                :content="data.test_selectTable"
+        ></sly-table>
 
     </sly-card>
 

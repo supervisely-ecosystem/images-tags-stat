@@ -355,6 +355,66 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
     return df
 
 
+def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
+    for tag in curr_image_tags:
+        if tag.name in state:
+            ds_images_tags_1[tag.name] += 1
+
+
+@my_app.callback("my_test_select")
+@sly.timeit
+def my_test_select(api: sly.Api, task_id, context, state, app_logger):
+
+    project_info = api.project.get_info_by_id(PROJECT_ID)
+    meta_json = api.project.get_meta(project_info.id)
+    meta = sly.ProjectMeta.from_json(meta_json)
+
+    columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
+    datasets_counts_1 = []
+    id_to_tagmeta = meta.tag_metas.get_id_mapping()
+
+    for dataset in api.dataset.get_list(PROJECT_ID):
+        columns_images_tags_1.extend([dataset.name])  # 1
+        ds_images_tags_1 = defaultdict(int)  # 1
+        images = api.image.get_list(dataset.id)
+
+        for batch in sly.batched(images, batch_size=10):
+            image_ids = []
+            for image_info in batch:
+                image_ids.append(image_info.id)
+                curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
+
+                process_images_tags_test(curr_image_tags, ds_images_tags_1)  # 1
+
+        datasets_counts_1.append((dataset.name, ds_images_tags_1))
+    df_test = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)  # 1
+    print(df_test)
+
+    report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
+    local_path = os.path.join(my_app.data_dir, report_name)
+    sly.fs.ensure_base_path(local_path)
+    with open(local_path, "w") as text_file:
+        print(my_app.app_url, file=text_file)
+    remote_path = "/reports/images_tags_stat/{}".format(report_name)
+    remote_path = api.file.get_free_name(TEAM_ID, remote_path)
+    report_name = sly.fs.get_file_name_with_ext(remote_path)
+    file_info = api.file.upload(TEAM_ID, local_path, remote_path)
+    report_url = api.file.get_url(file_info.id)
+
+    fields = [
+        {"field": "data.loading", "payload": False},
+        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_test.to_json(orient="split"))},
+        {"field": "data.savePath", "payload": remote_path},
+        {"field": "data.reportName", "payload": report_name},
+        {"field": "data.reportUrl", "payload": report_url},
+    ]
+
+    api.task.set_fields(task_id, fields)
+    api.task.set_output_report(task_id, file_info.id, report_name)
+    my_app.stop()
+
+
+
 @my_app.callback("images_tags_stats")
 @sly.timeit
 def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
@@ -363,8 +423,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
-    #=====================my_test_select============================================================
-
+    #=================my_test_select===============================================================
     project_tags = []
     for tag in meta.tag_metas:
         project_tags.append({"value": tag.name, "label": tag.name})
@@ -373,13 +432,11 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "state.options", "payload": project_tags}
     ]
-
     api.task.set_fields(task_id, fields)
 
-    a=0
+    #=================my_test_select===============================================================
 
 
-    # =====================my_test_select============================================================
 
     if len(meta.tag_metas) == 0:
         app_logger.warn("Project {!r} have no tags".format(project_info.name))
