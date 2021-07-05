@@ -363,6 +363,25 @@ def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
             ds_images_tags_1[tag.name] += 1
 
 
+def get_pd_tag_stat_test(meta, datasets, columns, state):
+    data = []
+    for idx, name in enumerate(state['choose_tags']):
+        row = [idx, name]
+        row.extend([0])
+        for ds_name, ds_property_tags in datasets:
+            row.extend([ds_property_tags[name]])
+            row[2] += ds_property_tags[name]
+        data.append(row)
+
+    df = pd.DataFrame(data, columns=columns)
+    total_row = list(df.sum(axis=0))
+    total_row[0] = len(df)
+    total_row[1] = TOTAL
+    df.loc[len(df)] = total_row
+
+    return df
+
+
 @my_app.callback("my_test_select")
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
@@ -390,7 +409,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 process_images_tags_test(curr_image_tags, ds_images_tags_1, state)  # 1
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))
-    df_test = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)  # 1
+    df_test = get_pd_tag_stat_test(meta, datasets_counts_1, columns_images_tags_1)  # 1
     print(df_test)
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
