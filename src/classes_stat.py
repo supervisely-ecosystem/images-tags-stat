@@ -358,13 +358,8 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 
 def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
 
-    choose_tags = []
-    for curr_data in state['options']:
-        choose_tags.append(curr_data['value'])
-
-    logger.warn('Choose tags: {}'.format(choose_tags))
     for tag in curr_image_tags:
-        if tag.name in choose_tags:
+        if tag.name in state['choose_tags']:
             ds_images_tags_1[tag.name] += 1
 
 
