@@ -384,7 +384,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 image_ids.append(image_info.id)
                 curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
 
-                process_images_tags_test(curr_image_tags, ds_images_tags_1)  # 1
+                process_images_tags_test(curr_image_tags, ds_images_tags_1, state)  # 1
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))
     df_test = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)  # 1
