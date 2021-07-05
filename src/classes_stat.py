@@ -436,7 +436,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
 
     #=================my_test_select===============================================================
 
-
+    '''
 
     if len(meta.tag_metas) == 0:
         app_logger.warn("Project {!r} have no tags".format(project_info.name))
@@ -629,7 +629,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     api.task.set_fields(task_id, fields)
     api.task.set_output_report(task_id, file_info.id, report_name)
     my_app.stop()
-
+    '''
 
 def main():
     sly.logger.info("Script arguments", extra={
