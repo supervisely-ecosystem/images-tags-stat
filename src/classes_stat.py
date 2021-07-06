@@ -445,7 +445,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
-    state = {'choose_tags': ['like', 'person_gender']}
+    #state = {'choose_tags': ['like', 'person_gender']}
 
     tags_to_values = defaultdict(list)
 
@@ -471,11 +471,10 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
             options_data.append({"value": tag_val, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
-
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.test_selectTable", "payload": []},
-        {"field": "group.options", "payload": select_data}
+        {"field": "group.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
 
@@ -710,7 +709,7 @@ def main():
         "userImageTable": {"columns": [], "data": []}
     }
 
-    my_app.run(data=data, initial_events=[{"command": "images_tags_stats"}])
+    my_app.run(data=data, initial_events=[{"command": "choose_tags_values"}])
 
 
 if __name__ == "__main__":
