@@ -474,7 +474,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.test_selectTable", "payload": []},
-        {"field": "options3", "payload": select_data}
+        {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
 

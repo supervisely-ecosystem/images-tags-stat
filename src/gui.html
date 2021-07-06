@@ -6,7 +6,7 @@
             subtitle="My test select"
     >
 
-        <div>
+
           <el-select v-model="state.choose_tags" multiple placeholder="Select">
             <el-option
               v-for="item in state.options"
@@ -16,9 +16,35 @@
             </el-option>
           </el-select>
             <el-button v-loading="state.loading" class="regular" type="primary"
-            @click="command('my_test_select')">Run</el-button>
-        </div>
+            @click="command('choose_tags_values')">Run</el-button>
 
+          <el-select v-model="state.choose_vals" multiple placeholder="Select vals">
+            <el-option-group
+              v-for="group in state.options3"
+              :key="group.label"
+              :label="group.label">
+                <el-option
+                  v-for="item in group.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"></el-option>
+            </el-option-group>
+          </el-select>
+
+            <el-button v-loading="state.loading" class="regular" type="primary"
+            @click="command('my_test_select')">Test</el-button>
+
+
+    </sly-card>
+
+
+
+
+    <sly-card
+            class="mt15"
+            title="My test table"
+            subtitle="My test table"
+    >
         <sly-table
                 v-loading="data.imgs_tags_stat"
                 :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
@@ -26,6 +52,8 @@
         ></sly-table>
 
     </sly-card>
+
+
 
 
     <sly-card
