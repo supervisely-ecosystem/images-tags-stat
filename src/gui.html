@@ -15,8 +15,8 @@
               :value="item.value">
             </el-option>
           </el-select>
-            <el-button v-loading="state.loading" class="regular" type="primary"
-            @click="command('choose_tags_values')">Run</el-button>
+
+            @change="command('choose_tags_values')"
 
           <el-select v-model="state.choose_vals" multiple placeholder="Select vals">
             <el-option-group
