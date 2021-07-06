@@ -454,7 +454,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.test_selectTable", "payload": None},
+        {"field": "data.test_selectTable", "payload": []},
         {"field": "state.options", "payload": project_tags}
     ]
     api.task.set_fields(task_id, fields)
