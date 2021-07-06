@@ -425,7 +425,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.test_selectTable", "payload": json.loads(df_test.to_json(orient="split"))},
+        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_test.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -469,7 +469,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.test_selectTable", "payload": []},
+        {"field": "data.imgs_tags_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -490,7 +490,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.test_selectTable", "payload": []},
+        {"field": "data.imgs_tags_statTable", "payload": []},
         {"field": "state.options", "payload": project_tags}
     ]
     api.task.set_fields(task_id, fields)

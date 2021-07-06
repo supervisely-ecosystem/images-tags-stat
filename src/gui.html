@@ -2,12 +2,10 @@
 
     <sly-card
             class="mt15"
-            title="My test select"
-            subtitle="My test select"
+            title="Select images tags and values"
     >
 
-
-          <el-select v-model="state.choose_tags" multiple placeholder="Select" @change="command('choose_tags_values');">
+          <el-select v-model="state.choose_tags" multiple placeholder="Select images tags" @change="command('choose_tags_values');">
             <el-option
               v-for="item in state.options"
               :key="item.value"
@@ -16,7 +14,7 @@
             </el-option>
           </el-select>
 
-          <el-select v-model="state.choose_vals" multiple placeholder="Select vals">
+          <el-select v-model="state.choose_vals" multiple placeholder="Select values">
             <el-option-group
               v-for="group in state.options3"
               :key="group.label"
@@ -30,7 +28,7 @@
           </el-select>
 
             <el-button v-loading="state.loading" class="regular" type="primary"
-            @click="command('my_test_select')">Test</el-button>
+            @click="command('my_test_select')">Get statistics</el-button>
 
 
     </sly-card>
