@@ -474,11 +474,9 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.test_selectTable", "payload": []},
-        {"field": "group.options3", "payload": select_data}
+        {"field": "options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
-
-
 
 
 @my_app.callback("images_tags_stats")
@@ -709,7 +707,7 @@ def main():
         "userImageTable": {"columns": [], "data": []}
     }
 
-    my_app.run(data=data, initial_events=[{"command": "choose_tags_values"}])
+    my_app.run(data=data, initial_events=[{"command": "images_tags_stats"}])
 
 
 if __name__ == "__main__":
