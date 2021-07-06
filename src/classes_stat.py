@@ -437,9 +437,9 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     api.task.set_fields(task_id, fields)
 
-    logger.warn('report_name: {}'.format(report_name))
-    logger.warn('report_ready: {}'.format(report_ready))
     if not report_ready:
+        logger.warn('report_name: {}'.format(report_name))
+        logger.warn('report_ready: {}'.format(report_ready))
         api.task.set_output_report(task_id, file_info.id, report_name)
         report_ready = True
     #my_app.stop()
