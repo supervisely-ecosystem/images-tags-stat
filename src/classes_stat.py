@@ -433,10 +433,53 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.reportUrl", "payload": report_url},
     ]
 
-
     api.task.set_fields(task_id, fields)
-    #api.task.set_output_report(task_id, file_info.id, report_name)
-    #my_app.stop()
+
+
+@my_app.callback("choose_tags_values")
+@sly.timeit
+def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
+
+    logger.warn('start choose_tags_values, state = {}'.format(state))
+    project_info = api.project.get_info_by_id(PROJECT_ID)
+    meta_json = api.project.get_meta(project_info.id)
+    meta = sly.ProjectMeta.from_json(meta_json)
+
+    state = {'choose_tags': ['like', 'person_gender']}
+
+    tags_to_values = defaultdict(list)
+
+    id_to_tagmeta = meta.tag_metas.get_id_mapping()
+
+    for dataset in api.dataset.get_list(PROJECT_ID):
+        images = api.image.get_list(dataset.id)
+        for batch in sly.batched(images, batch_size=10):
+            image_ids = []
+            for image_info in batch:
+                image_ids.append(image_info.id)
+                curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
+                for curr_tag in curr_image_tags:
+                    if curr_tag.name in state['choose_tags']:
+                        if curr_tag.value not in tags_to_values[curr_tag.name]:
+                            tags_to_values[curr_tag.name].append(curr_tag.value)
+
+    select_data = []
+
+    for tag_name in tags_to_values:
+        options_data = []
+        for tag_val in tags_to_values[tag_name]:
+            options_data.append({"value": tag_val, "label":tag_val})
+        select_data.append({"label": tag_name, "options":options_data})
+
+
+    fields = [
+        {"field": "data.loading", "payload": False},
+        {"field": "data.test_selectTable", "payload": []},
+        {"field": "group.options", "payload": select_data}
+    ]
+    api.task.set_fields(task_id, fields)
+
+
 
 
 @my_app.callback("images_tags_stats")

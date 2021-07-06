@@ -16,9 +16,42 @@
             </el-option>
           </el-select>
             <el-button v-loading="state.loading" class="regular" type="primary"
+            @click="command('choose_tags_values')">Choose tag values</el-button>
+        </div>
+
+</sly-card>
+
+<sly-card
+            class="mt15"
+            title="Tags values"
+            subtitle="Choose tags values"
+    >
+        <div>
+          <el-select v-model="state.choose_vals" placeholder="Select">
+    <el-option-group
+      v-for="group in options3"
+      :key="group.label"
+      :label="group.label">
+      <el-option
+        v-for="item in group.options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value">
+      </el-option>
+    </el-option-group>
+  </el-select>
+            <el-button v-loading="state.loading" class="regular" type="primary"
             @click="command('my_test_select')">Run</el-button>
         </div>
 
+</sly-card>
+
+
+    <sly-card
+        class="mt15"
+        title="My test select"
+        subtitle="My test select"
+    >
         <sly-table
                 v-loading="data.imgs_tags_stat"
                 :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
