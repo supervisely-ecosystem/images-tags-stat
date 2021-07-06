@@ -12,11 +12,12 @@
               v-for="item in state.options"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
+              :value="item.value"
+              @change="command('choose_tags_values')">
             </el-option>
           </el-select>
 
-            @change="command('choose_tags_values')"
+
 
           <el-select v-model="state.choose_vals" multiple placeholder="Select vals">
             <el-option-group
