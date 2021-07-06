@@ -14,7 +14,7 @@
             </el-option>
           </el-select>
 
-          <el-select v-model="state.choose_vals" multiple placeholder="Select values">
+          <el-select v-model="state.choose_vals" multiple placeholder="Select values" clearable=True>
             <el-option-group
               v-for="group in state.options3"
               :key="group.label"
@@ -32,24 +32,6 @@
 
 
     </sly-card>
-
-
-
-
-    <sly-card
-            class="mt15"
-            title="My test table"
-            subtitle="My test table"
-    >
-        <sly-table
-                v-loading="data.imgs_tags_stat"
-                :options="{perPage: 40, pageSizes: [15, 30, 40, 100]}"
-                :content="data.test_selectTable"
-        ></sly-table>
-
-    </sly-card>
-
-
 
 
     <sly-card

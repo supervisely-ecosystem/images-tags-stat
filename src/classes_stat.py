@@ -408,8 +408,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 process_images_tags_test(curr_image_tags, ds_images_tags_1, state)  # 1
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))
-    df_test = get_pd_tag_stat_test(datasets_counts_1, columns_images_tags_1, state)  # 1
-    print(df_test)
+    df_1 = get_pd_tag_stat_test(datasets_counts_1, columns_images_tags_1, state)  # 1
+    print(df_1)
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -425,7 +425,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     fields = [
         {"field": "data.loading", "payload": False},
-        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_test.to_json(orient="split"))},
+        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
