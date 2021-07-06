@@ -357,13 +357,12 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 
 
 def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
-
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
             ds_images_tags_1[tag.name] += 1
 
 
-def get_pd_tag_stat_test(meta, datasets, columns, state):
+def get_pd_tag_stat_test(datasets, columns, state):
     data = []
     for idx, name in enumerate(state['choose_tags']):
         row = [idx, name]
@@ -385,7 +384,6 @@ def get_pd_tag_stat_test(meta, datasets, columns, state):
 @my_app.callback("my_test_select")
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
-
 
     logger.warn('start my_test_select, state = {}'.format(state))
     project_info = api.project.get_info_by_id(PROJECT_ID)
@@ -410,7 +408,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 process_images_tags_test(curr_image_tags, ds_images_tags_1, state)  # 1
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))
-    df_test = get_pd_tag_stat_test(meta, datasets_counts_1, columns_images_tags_1, state)  # 1
+    df_test = get_pd_tag_stat_test(datasets_counts_1, columns_images_tags_1, state)  # 1
     print(df_test)
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
@@ -444,8 +442,6 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
-
-    #state = {'choose_tags': ['like', 'person_gender']}
 
     tags_to_values = defaultdict(list)
 
