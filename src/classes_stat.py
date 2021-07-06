@@ -419,7 +419,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     with open(local_path, "w") as text_file:
         print(my_app.app_url, file=text_file)
     remote_path = "/reports/images_tags_stat/{}".format(report_name)
-    remote_path = api.file.get_free_name(TEAM_ID, remote_path)
+    #remote_path = api.file.get_free_name(TEAM_ID, remote_path)
     report_name = sly.fs.get_file_name_with_ext(remote_path)
     file_info = api.file.upload(TEAM_ID, local_path, remote_path)
     report_url = api.file.get_url(file_info.id)
