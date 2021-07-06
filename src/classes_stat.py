@@ -382,9 +382,13 @@ def get_pd_tag_stat_test(meta, datasets, columns, state):
     return df
 
 
+report_ready = False
+
 @my_app.callback("my_test_select")
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
+
+    global report_ready
 
     logger.warn('start my_test_select, state = {}'.format(state))
     project_info = api.project.get_info_by_id(PROJECT_ID)
@@ -432,9 +436,11 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     ]
 
     api.task.set_fields(task_id, fields)
-    api.task.set_output_report(task_id, file_info.id, report_name)
-    #my_app.stop()
 
+    if not report_ready:
+        api.task.set_output_report(task_id, file_info.id, report_name)
+        report_ready = True
+    #my_app.stop()
 
 
 @my_app.callback("images_tags_stats")
