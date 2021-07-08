@@ -82,7 +82,8 @@ def get_pd_tag_stat_2(meta, datasets, columns, state):
     return df
 
 
-def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals):
+def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
+    logger.warn('process3: {}'.format(state))
     for tag in curr_image_tags:
         if tag.value not in tags_to_vals[tag.name]:
             tags_to_vals[tag.name].append(tag.value)
@@ -371,6 +372,10 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     # ========================================================================================== 2 ====
     columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
     datasets_counts_2 = []
+    # ========================================================================================== 3 ====
+    columns_images_tags_3 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
+    datasets_counts_3 = []
+    tags_to_vals = defaultdict(list)
 
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
@@ -381,6 +386,9 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
         columns_images_tags_2.extend([dataset.name])                                            # 2
         ds_tags_to_imgs_urls_2 = defaultdict(list)                                              # 2
+
+        columns_images_tags_3.extend([dataset.name])                                            # 3
+        ds_images_tags_vals_3 = defaultdict(lambda: defaultdict(int))                           # 3
 
 
         images = api.image.get_list(dataset.id)
@@ -393,6 +401,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
                 process_images_tags_1(curr_image_tags, ds_images_tags_1, state)                    # 1
                 process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls_2, state)  # 2
+                process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state) # 3
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))                                 # 1
         datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                           # 2
@@ -420,6 +429,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
         {"field": "data.tags_to_imgs_urls_statTable", "payload": json.loads(df_2.to_json(orient="split"))},
+        #{"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
+        #{"field": "data.tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_4.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -467,6 +478,8 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": []},
         {"field": "data.tags_to_imgs_urls_statTable", "payload": []},
+        {"field": "data.imgs_tags_vals_statTable", "payload": []},
+        {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -493,6 +506,9 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": []},
         {"field": "data.tags_to_imgs_urls_statTable", "payload": []},
+        {"field": "data.imgs_tags_vals_statTable", "payload": []},
+        {"field": "data.tags_vals_to_imgs_urls_statTable", "payload":[]},
+
         {"field": "state.options", "payload": images_tags}
     ]
     api.task.set_fields(task_id, fields)
