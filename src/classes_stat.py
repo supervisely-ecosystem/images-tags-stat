@@ -5,6 +5,7 @@ import pandas as pd
 import copy, json
 from operator import add
 from collections import defaultdict
+from supervisely_lib.annotation.tag_meta import TagApplicableTo
 
 my_app = sly.AppService()
 
@@ -30,15 +31,15 @@ FIRST_STRING = '#'
 logger = my_app.logger
 
 
-def process_images_tags_1(curr_image_tags, ds_images_tags_1):
+def process_images_tags_1(curr_image_tags, ds_images_tags_1, state):
     for tag in curr_image_tags:
-        ds_images_tags_1[tag.name] += 1
+        if tag.name in state['choose_tags']:
+            ds_images_tags_1[tag.name] += 1
 
 
-def get_pd_tag_stat_1(meta, datasets, columns):
+def get_pd_tag_stat_1(datasets, columns, state):
     data = []
-    for idx, tag_meta in enumerate(meta.tag_metas):
-        name = tag_meta.name
+    for idx, name in enumerate(state['choose_tags']):
         row = [idx, name]
         row.extend([0])
         for ds_name, ds_property_tags in datasets:
@@ -55,18 +56,17 @@ def get_pd_tag_stat_1(meta, datasets, columns):
     return df
 
 
-def process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls):
+def process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls, state):
     for tag in curr_image_tags:
-        ds_tags_to_imgs_urls[tag.name].append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
-                         .format(image_info.full_storage_url, image_info.name))
+        if tag.name in state['choose_tags']:
+            ds_tags_to_imgs_urls[tag.name].append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
+                             .format(image_info.full_storage_url, image_info.name))
 
 
-def get_pd_tag_stat_2(meta, datasets, columns):
+def get_pd_tag_stat_2(meta, datasets, columns, state):
     data = []
     idx = 0
-    for tag_meta in meta.tag_metas:
-        name = tag_meta.name
-
+    for name in state['choose_tags']:
         all_ds_rows = ['' for _ in datasets]
 
         for ds_index, (ds_name, ds_property_tags) in enumerate(datasets):
@@ -356,31 +356,6 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
     return df
 
 
-def process_images_tags_test(curr_image_tags, ds_images_tags_1, state):
-    for tag in curr_image_tags:
-        if tag.name in state['choose_tags']:
-            ds_images_tags_1[tag.name] += 1
-
-
-def get_pd_tag_stat_test(datasets, columns, state):
-    data = []
-    for idx, name in enumerate(state['choose_tags']):
-        row = [idx, name]
-        row.extend([0])
-        for ds_name, ds_property_tags in datasets:
-            row.extend([ds_property_tags[name]])
-            row[2] += ds_property_tags[name]
-        data.append(row)
-
-    df = pd.DataFrame(data, columns=columns)
-    total_row = list(df.sum(axis=0))
-    total_row[0] = len(df)
-    total_row[1] = TOTAL
-    df.loc[len(df)] = total_row
-
-    return df
-
-
 @my_app.callback("my_test_select")
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
@@ -390,13 +365,24 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
+    # ========================================================================================== 1 ====
     columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
     datasets_counts_1 = []
+    # ========================================================================================== 2 ====
+    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
+    datasets_counts_2 = []
+
+
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
 
     for dataset in api.dataset.get_list(PROJECT_ID):
-        columns_images_tags_1.extend([dataset.name])  # 1
-        ds_images_tags_1 = defaultdict(int)  # 1
+        columns_images_tags_1.extend([dataset.name])                                            # 1
+        ds_images_tags_1 = defaultdict(int)                                                     # 1
+
+        columns_images_tags_2.extend([dataset.name])                                            # 2
+        ds_tags_to_imgs_urls_2 = defaultdict(list)                                              # 2
+
+
         images = api.image.get_list(dataset.id)
 
         for batch in sly.batched(images, batch_size=10):
@@ -405,11 +391,18 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 image_ids.append(image_info.id)
                 curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
 
-                process_images_tags_test(curr_image_tags, ds_images_tags_1, state)  # 1
+                process_images_tags_1(curr_image_tags, ds_images_tags_1, state)                    # 1
+                process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls_2, state)  # 2
 
-        datasets_counts_1.append((dataset.name, ds_images_tags_1))
-    df_1 = get_pd_tag_stat_test(datasets_counts_1, columns_images_tags_1, state)  # 1
-    print(df_1)
+        datasets_counts_1.append((dataset.name, ds_images_tags_1))                                 # 1
+        datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                           # 2
+
+
+
+    df_1 = get_pd_tag_stat_1(datasets_counts_1, columns_images_tags_1, state)                      # 1
+    print(df_1)                                                                                    # 1
+    df_2 = get_pd_tag_stat_2(meta, datasets_counts_2, columns_images_tags_2, state)                # 2
+    print(df_2)                                                                                    # 2
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -426,6 +419,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
+        {"field": "data.tags_to_imgs_urls_statTable", "payload": json.loads(df_2.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -472,6 +466,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": []},
+        {"field": "data.tags_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -486,14 +481,19 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     meta = sly.ProjectMeta.from_json(meta_json)
 
     #=================my_test_select===============================================================
-    project_tags = []
+    images_tags = []
+    objects_tags = []
     for tag in meta.tag_metas:
-        project_tags.append({"value": tag.name, "label": tag.name})
+        if tag.applicable_to != TagApplicableTo.OBJECTS_ONLY:
+            images_tags.append({"value": tag.name, "label": tag.name})
+        if tag.applicable_to != TagApplicableTo.IMAGES_ONLY:
+            objects_tags.append({"value": tag.name, "label": tag.name})
 
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": []},
-        {"field": "state.options", "payload": project_tags}
+        {"field": "data.tags_to_imgs_urls_statTable", "payload": []},
+        {"field": "state.options", "payload": images_tags}
     ]
     api.task.set_fields(task_id, fields)
 
