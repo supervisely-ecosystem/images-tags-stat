@@ -85,7 +85,7 @@ def get_pd_tag_stat_2(meta, datasets, columns, state):
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
-            if tag.name in state['choose_vals']:
+            if tag.value in state['choose_vals']:
                 if tag.value not in tags_to_vals[tag.name]:
                     tags_to_vals[tag.name].append(tag.value)
                 ds_images_tags_vals_3[tag.name][tag.value] += 1
