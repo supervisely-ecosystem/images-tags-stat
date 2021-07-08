@@ -83,14 +83,15 @@ def get_pd_tag_stat_2(meta, datasets, columns, state):
 
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
-    logger.warn('process3: {}'.format(state))
     for tag in curr_image_tags:
-        if tag.value not in tags_to_vals[tag.name]:
-            tags_to_vals[tag.name].append(tag.value)
-        ds_images_tags_vals_3[tag.name][tag.value] += 1
+        if tag.name in state['choose_tags']:
+            if tag.name in state['choose_vals']:
+                if tag.value not in tags_to_vals[tag.name]:
+                    tags_to_vals[tag.name].append(tag.value)
+                ds_images_tags_vals_3[tag.name][tag.value] += 1
 
 
-def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
+def get_pd_tag_stat_3(datasets, columns, tags_to_vals, state):
 
     data = []
 
@@ -405,6 +406,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
         datasets_counts_1.append((dataset.name, ds_images_tags_1))                                 # 1
         datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                           # 2
+        datasets_counts_3.append((dataset.name, ds_images_tags_vals_3))                            # 3
 
 
 
@@ -412,6 +414,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     print(df_1)                                                                                    # 1
     df_2 = get_pd_tag_stat_2(meta, datasets_counts_2, columns_images_tags_2, state)                # 2
     print(df_2)                                                                                    # 2
+    df_3 = get_pd_tag_stat_3(datasets_counts_3, columns_images_tags_3, tags_to_vals, state)        # 3
+    print(df_3)                                                                                    # 3
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -429,7 +433,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
         {"field": "data.tags_to_imgs_urls_statTable", "payload": json.loads(df_2.to_json(orient="split"))},
-        #{"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
+        {"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
         #{"field": "data.tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_4.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
