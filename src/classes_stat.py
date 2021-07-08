@@ -93,10 +93,6 @@ def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, 
 
 def get_pd_tag_stat_3(datasets, columns, tags_to_vals, state):
 
-    logger.warn('columns: {}'.format(columns))
-    logger.warn('tags_to_vals: {}'.format(tags_to_vals))
-    logger.warn('state: {}'.format(state))
-
     data = []
 
     for idx, tag_name in enumerate(tags_to_vals):
@@ -112,7 +108,10 @@ def get_pd_tag_stat_3(datasets, columns, tags_to_vals, state):
     total_row = list(df.sum(axis=0))
     total_row[0] = len(df)
     total_row[1] = TOTAL
-    total_row.insert(2, '')
+    if len(total_row) != len(data[0]):
+        total_row.insert(2, '')
+    else:
+        total_row[2] = ''
     df.loc[len(df)] = total_row
 
     return df
@@ -366,7 +365,9 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 @sly.timeit
 def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
-    logger.warn('start my_test_select, state = {}'.format(state))
+    if 'None' in state['choose_vals']:
+        state['choose_vals'].append(None)
+
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
