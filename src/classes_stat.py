@@ -93,6 +93,10 @@ def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, 
 
 def get_pd_tag_stat_3(datasets, columns, tags_to_vals, state):
 
+    logger.warn('columns: {}'.format(columns))
+    logger.warn('tags_to_vals: {}'.format(tags_to_vals))
+    logger.warn('state: {}'.format(state))
+
     data = []
 
     for idx, tag_name in enumerate(tags_to_vals):
