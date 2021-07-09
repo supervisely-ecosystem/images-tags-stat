@@ -246,10 +246,12 @@ def get_pd_tag_stat_7(datasets, columns, obj_tags_to_vals):
     return df
 
 
-def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8):
+def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8, state):
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
     for tag in curr_object_tags:
-        ds_tags_to_imgs_urls_8[tag.name][tag.value][link] += 1
+        if tag.name in state['choose_objs_tags']:
+            if tag.value in state['choose_objs_vals']:
+                ds_tags_to_imgs_urls_8[tag.name][tag.value][link] += 1
 
 
 def get_pd_tag_stat_8(datasets, columns, obj_tags_to_vals):
@@ -408,6 +410,9 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     columns_objects_tags_7 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
     datasets_counts_7 = []
     obj_tags_to_vals = defaultdict(list)
+    # =========================================================================================== 8 ====
+    columns_objects_tags_vals_8 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
+    datasets_counts_8 = []
 
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
@@ -429,6 +434,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         ds_obj_tags_to_imgs_urls_6 = defaultdict(lambda: defaultdict(int))                      # 6
         columns_objects_tags_7.extend([dataset.name])                                           # 7
         ds_objects_tags_vals_7 = defaultdict(lambda: defaultdict(int))                          # 7
+        columns_objects_tags_vals_8.extend([dataset.name])                                      # 8
+        ds_tags_to_imgs_urls_8 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))     # 8
 
 
         images = api.image.get_list(dataset.id)
@@ -452,6 +459,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 process_objects_tags_5(curr_object_tags, ds_objects_tags_5, state)                  # 5
                 process_objects_tags_6(curr_object_tags, batch[idx], ds_obj_tags_to_imgs_urls_6, state)  # 6
                 process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state)  # 7
+                process_objects_tags_8(curr_object_tags, batch[idx], ds_tags_to_imgs_urls_8, state)         # 8
 
 
 
@@ -462,6 +470,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         datasets_counts_5.append((dataset.name, ds_objects_tags_5))                                # 5
         datasets_counts_6.append((dataset.name, ds_obj_tags_to_imgs_urls_6))                       # 6
         datasets_counts_7.append((dataset.name, ds_objects_tags_vals_7))                           # 7
+        datasets_counts_8.append((dataset.name, ds_tags_to_imgs_urls_8))                           # 8
 
     df_1 = get_pd_tag_stat_1(datasets_counts_1, columns_images_tags_1, state)                      # 1
     print(df_1)                                                                                    # 1
@@ -477,6 +486,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     print(df_6)                                                                                    # 6
     df_7 = get_pd_tag_stat_7(datasets_counts_7, columns_objects_tags_7, obj_tags_to_vals)          # 7
     print(df_7)                                                                                    # 7
+    df_8 = get_pd_tag_stat_8(datasets_counts_8, columns_objects_tags_vals_8, obj_tags_to_vals)     # 8
+    print(df_8)                                                                                    # 8
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -499,6 +510,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.objs_tags_statTable", "payload": json.loads(df_5.to_json(orient="split"))},
         {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": json.loads(df_6.to_json(orient="split"))},
         {"field": "data.objs_tags_vals_statTable", "payload": json.loads(df_7.to_json(orient="split"))},
+        {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_8.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -550,6 +562,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.objs_tags_statTable", "payload": []},
         {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
         {"field": "data.objs_tags_vals_statTable", "payload": []},
+        {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -600,6 +613,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.objs_tags_statTable", "payload": []},
         {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
         {"field": "data.objs_tags_vals_statTable", "payload": []},
+        {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3_objs", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -631,6 +645,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.objs_tags_statTable", "payload": []},
         {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
         {"field": "data.objs_tags_vals_statTable", "payload": []},
+        {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": []},
 
         {"field": "state.options", "payload": images_tags},
         {"field": "state.options_objs", "payload": objects_tags}
