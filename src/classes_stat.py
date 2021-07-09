@@ -792,7 +792,7 @@ def main():
         "userImageTable": {"columns": [], "data": []}
     }
 
-    my_app.run(data=data, initial_events=[{"command": "choose_objs_tags_values"}])
+    my_app.run(data=data, initial_events=[{"command": "images_tags_stats"}])
 
 
 if __name__ == "__main__":
