@@ -463,7 +463,6 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 @sly.timeit
 def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
 
-    logger.warn('start choose_tags_values, state = {}'.format(state))
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
@@ -505,6 +504,54 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     api.task.set_fields(task_id, fields)
 
 
+@my_app.callback("choose_objs_tags_values")
+@sly.timeit
+def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
+
+    logger.warn('start choose_objs_tags_values, state = {}'.format(state))
+    project_info = api.project.get_info_by_id(PROJECT_ID)
+    meta_json = api.project.get_meta(project_info.id)
+    meta = sly.ProjectMeta.from_json(meta_json)
+
+    tags_to_values = defaultdict(list)
+
+    for dataset in api.dataset.get_list(PROJECT_ID):
+        images = api.image.get_list(dataset.id)
+        for batch in sly.batched(images, batch_size=10):
+            image_ids = []
+            for image_info in batch:
+                image_ids.append(image_info.id)
+
+            ann_infos = api.annotation.download_batch(dataset.id, image_ids)
+            for idx, ann_info in enumerate(ann_infos):
+                ann = sly.Annotation.from_json(ann_info.annotation, meta)
+                curr_object_tags = get_objects_tags(ann)
+                for curr_tag in curr_object_tags:
+                    if curr_tag.name in state['choose_objs_tags']:
+                        if curr_tag.value not in tags_to_values[curr_tag.name]:
+                            tags_to_values[curr_tag.name].append(curr_tag.value)
+
+    select_data = []
+
+    for tag_name in tags_to_values:
+        options_data = []
+        for tag_val in tags_to_values[tag_name]:
+            if tag_val == None:
+                tag_val = 'None'
+            options_data.append({"value": tag_val, "label":tag_val})
+        select_data.append({"label": tag_name, "options":options_data})
+
+    fields = [
+        {"field": "data.loading", "payload": False},
+        {"field": "data.imgs_tags_statTable", "payload": []},
+        {"field": "data.tags_to_imgs_urls_statTable", "payload": []},
+        {"field": "data.imgs_tags_vals_statTable", "payload": []},
+        {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": []},
+        {"field": "state.options3_objs", "payload": select_data}
+    ]
+    api.task.set_fields(task_id, fields)
+
+
 @my_app.callback("images_tags_stats")
 @sly.timeit
 def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
@@ -529,7 +576,8 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.imgs_tags_vals_statTable", "payload": []},
         {"field": "data.tags_vals_to_imgs_urls_statTable", "payload":[]},
 
-        {"field": "state.options", "payload": images_tags}
+        {"field": "state.options", "payload": images_tags},
+        {"field": "state.options_objs", "payload": objects_tags}
     ]
     api.task.set_fields(task_id, fields)
 

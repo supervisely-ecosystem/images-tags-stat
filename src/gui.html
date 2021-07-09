@@ -2,7 +2,7 @@
 
     <sly-card
             class="mt15"
-            title="Select images tags and values"
+            title="Select images and objects tags and values"
     >
 
           <el-select v-model="state.choose_tags" multiple placeholder="Select images tags" @change="command('choose_tags_values');">
@@ -14,13 +14,35 @@
             </el-option>
           </el-select>
 
-          <el-select v-model="state.choose_vals" multiple placeholder="Select values">
+          <el-select v-model="state.choose_vals" multiple placeholder="Select images tags values">
             <el-option-group
               v-for="group in state.options3"
               :key="group.label"
               :label="group.label">
                 <el-option
                   v-for="item in group.options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"></el-option>
+            </el-option-group>
+          </el-select>
+
+          <el-select v-model="state.choose_objs_tags" multiple placeholder="Select object tags" @change="command('choose_objs_tags_values');">
+            <el-option
+              v-for="item in state.options_objs"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+
+          <el-select v-model="state.choose_vals" multiple placeholder="Select object tags values">
+            <el-option-group
+              v-for="group in state.options3_objs"
+              :key="group.label"
+              :label="group.label">
+                <el-option
+                  v-for="item in group.options_objs"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"></el-option>
