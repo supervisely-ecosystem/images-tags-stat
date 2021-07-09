@@ -509,6 +509,9 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
 def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
 
     logger.warn('start choose_objs_tags_values, state = {}'.format(state))
+
+    #state = {'choose_objs_tags': ['object_tag', 'vehicle_age'], 'choose_objs_vals': []}
+
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
@@ -789,7 +792,7 @@ def main():
         "userImageTable": {"columns": [], "data": []}
     }
 
-    my_app.run(data=data, initial_events=[{"command": "images_tags_stats"}])
+    my_app.run(data=data, initial_events=[{"command": "choose_objs_tags_values"}])
 
 
 if __name__ == "__main__":
