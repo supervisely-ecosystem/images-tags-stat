@@ -182,17 +182,17 @@ def get_pd_tag_stat_5(datasets, columns, state):
     return df
 
 
-def process_objects_tags_6(curr_object_tags, image_info, ds_obj_tags_to_imgs_urls_6):
+def process_objects_tags_6(curr_object_tags, image_info, ds_obj_tags_to_imgs_urls_6, state):
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
     for tag in curr_object_tags:
-        ds_obj_tags_to_imgs_urls_6[tag.name][link] += 1
+        if tag.name in state['choose_objs_tags']:
+            ds_obj_tags_to_imgs_urls_6[tag.name][link] += 1
 
 
-def get_pd_tag_stat_6(meta, datasets, columns):
+def get_pd_tag_stat_6(meta, datasets, columns, state):
     data = []
     idx = 0
-    for tag_meta in meta.tag_metas:
-        name = tag_meta.name
+    for name in state['choose_objs_tags']:
 
         all_ds_rows = ['' for _ in datasets]
 
@@ -393,6 +393,9 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     # =========================================================================================== 5 ====
     columns_objects_tags_5 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
     datasets_counts_5 = []
+    # =========================================================================================== 6 ====
+    columns_objects_tags_6 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
+    datasets_counts_6 = []
 
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
@@ -410,6 +413,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         ds_tags_to_imgs_urls_4 = defaultdict(lambda: defaultdict(list))                         # 4
         columns_objects_tags_5.extend([dataset.name])                                           # 5
         ds_objects_tags_5 = defaultdict(int)                                                    # 5
+        columns_objects_tags_6.extend([dataset.name])                                           # 6
+        ds_obj_tags_to_imgs_urls_6 = defaultdict(lambda: defaultdict(int))                      # 6
 
 
         images = api.image.get_list(dataset.id)
@@ -431,6 +436,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
                 ann = sly.Annotation.from_json(ann_info.annotation, meta)
                 curr_object_tags = get_objects_tags(ann)
                 process_objects_tags_5(curr_object_tags, ds_objects_tags_5, state)                  # 5
+                process_objects_tags_6(curr_object_tags, batch[idx], ds_obj_tags_to_imgs_urls_6, state)  # 6
 
 
 
@@ -439,6 +445,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         datasets_counts_3.append((dataset.name, ds_images_tags_vals_3))                            # 3
         datasets_counts_4.append((dataset.name, ds_tags_to_imgs_urls_4))                           # 4
         datasets_counts_5.append((dataset.name, ds_objects_tags_5))                                # 5
+        datasets_counts_6.append((dataset.name, ds_obj_tags_to_imgs_urls_6))  # 6
 
     df_1 = get_pd_tag_stat_1(datasets_counts_1, columns_images_tags_1, state)                      # 1
     print(df_1)                                                                                    # 1
@@ -450,6 +457,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     print(df_4)                                                                                    # 4
     df_5 = get_pd_tag_stat_5(datasets_counts_5, columns_objects_tags_5, state)                     # 5
     print(df_5)                                                                                    # 5
+    df_6 = get_pd_tag_stat_6(meta, datasets_counts_6, columns_objects_tags_6, state)               # 6
+    print(df_6)                                                                                    # 6
 
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
@@ -470,6 +479,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
         {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_4.to_json(orient="split"))},
         {"field": "data.objs_tags_statTable", "payload": json.loads(df_5.to_json(orient="split"))},
+        {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": json.loads(df_6.to_json(orient="split"))},
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -519,6 +529,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.imgs_tags_vals_statTable", "payload": []},
         {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": []},
         {"field": "data.objs_tags_statTable", "payload": []},
+        {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -567,6 +578,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.imgs_tags_vals_statTable", "payload": []},
         {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": []},
         {"field": "data.objs_tags_statTable", "payload": []},
+        {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
         {"field": "state.options3_objs", "payload": select_data}
     ]
     api.task.set_fields(task_id, fields)
@@ -596,6 +608,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.imgs_tags_vals_statTable", "payload": []},
         {"field": "data.tags_vals_to_imgs_urls_statTable", "payload":[]},
         {"field": "data.objs_tags_statTable", "payload": []},
+        {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": []},
 
         {"field": "state.options", "payload": images_tags},
         {"field": "state.options_objs", "payload": objects_tags}
