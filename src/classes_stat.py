@@ -108,8 +108,11 @@ def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
     total_row = list(df.sum(axis=0))
     total_row[0] = len(df)
     total_row[1] = TOTAL
-    if len(total_row) != len(data[0]):
-        total_row.insert(2, '')
+    if len(data) > 0:
+        if len(total_row) != len(data[0]):
+            total_row.insert(2, '')
+        else:
+            total_row[2] = ''
     else:
         total_row[2] = ''
     df.loc[len(df)] = total_row
@@ -162,8 +165,7 @@ def process_objects_tags_5(curr_object_tags, ds_objects_tags_5, state):
 
 def get_pd_tag_stat_5(datasets, columns, state):
     data = []
-    for idx, tag_meta in enumerate(state['choose_objs_tags']):
-        name = tag_meta.name
+    for idx, name in enumerate(state['choose_objs_tags']):
         row = [idx, name]
         row.extend([0])
         for ds_name, ds_property_tags in datasets:
