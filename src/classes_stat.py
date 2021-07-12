@@ -537,12 +537,12 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
         app_logger.warn("1")
-        table_11 = {"field": "state.ObjTagsNoExist", "payload": False}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": True}
+        table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
     elif len(objects_tags) == 0:
         app_logger.warn("2")
-        table_11 = {"field": "state.noObjects", "payload": True}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": True}
+        table_11 = {"field": "state.noObjects", "payload": False}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
     else:
         app_logger.warn("3")
         table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
