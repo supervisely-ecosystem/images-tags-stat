@@ -206,6 +206,9 @@
             class="mt15"
             title="Objects tags vals to classes"
             subtitle="Objects tags vals to classes"
+            :options="{collapsable: false}"
+            :collapsed.sync="state.ObjTagsNoExist"
+            :disabled="{disabled: state.ObjTagsNoExist}"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
