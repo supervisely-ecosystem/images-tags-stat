@@ -750,8 +750,9 @@ def main():
     data = {
         "userImageTable": {"columns": [], "data": []}
     }
+    state = {"noObjects": True, "noObjectsAndVals":  True}
 
-    my_app.run(data=data, initial_events=[{"command": "images_tags_stats"}])
+    my_app.run(data=data, state=state, initial_events=[{"command": "images_tags_stats"}])
 
 
 if __name__ == "__main__":
