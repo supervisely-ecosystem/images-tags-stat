@@ -535,14 +535,16 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals)  # 12
     print(df_12)                                                                                     # 12
 
-    app_logger.warn("{}____{}".format((len(objects_tags) != 0), len(state['choose_objs_tags'])))
     if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
-        table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
+        app_logger.warn("1")
+        table_11 = {"field": "state.ObjTagsNoExist", "payload": False}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": True}
     elif len(objects_tags) == 0:
-        table_11 = {"field": "state.noObjects", "payload": False}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
+        app_logger.warn("2")
+        table_11 = {"field": "state.noObjects", "payload": True}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": True}
     else:
+        app_logger.warn("3")
         table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
         table_12 = {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))}
 
