@@ -9,7 +9,7 @@
   "main_script": "src/classes_stat.py",
   "gui_template": "src/gui.html",
   "modal_template": "src/modal.html",
-  "modal_template_state": {"noObjects": true},
+  "modal_template_state": {"noObjects": true, "noObjectsAndVals":  true},
   "task_location": "workspace_tasks",
   "icon": "https://i.imgur.com/dQbfTnd.png",
   "icon_background": "#FFFFFF",
