@@ -29,6 +29,7 @@ TAG_COLOMN = 'tag'
 TAG_VALUE_COLOMN = 'tag_value'
 FIRST_STRING = '#'
 logger = my_app.logger
+objects_tags = []
 
 
 def process_images_tags_1(curr_image_tags, ds_images_tags_1, state):
@@ -534,6 +535,12 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals)  # 12
     print(df_12)                                                                                     # 12
 
+    if len(objects_tags) == 0:
+        table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
+    else:
+        table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
+
+
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
     sly.fs.ensure_base_path(local_path)
@@ -560,8 +567,9 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.images_to_imgs_tag_val_statTable", "payload": json.loads(df_9.to_json(orient="split"))},
         {"field": "data.images_to_objs_tag_val_statTable", "payload": json.loads(df_10.to_json(orient="split"))},
 
-        {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))},
+        table_11,
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))},
+
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
@@ -690,9 +698,7 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
-    #=================my_test_select===============================================================
     images_tags = []
-    objects_tags = []
     for tag in meta.tag_metas:
         if tag.applicable_to != TagApplicableTo.OBJECTS_ONLY:
             images_tags.append({"value": tag.name, "label": tag.name})
@@ -721,202 +727,6 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
     ]
     api.task.set_fields(task_id, fields)
 
-    #=================my_test_select===============================================================
-
-    '''
-
-    if len(meta.tag_metas) == 0:
-        app_logger.warn("Project {!r} have no tags".format(project_info.name))
-        my_app.stop()
-
-    columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
-    datasets_counts_1 = []
-    #========================================================================================== 2 ====
-    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
-    datasets_counts_2 = []
-
-    # ========================================================================================== 3 ====
-    columns_images_tags_3 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
-    datasets_counts_3 = []
-    tags_to_vals = defaultdict(list)
-    # =========================================================================================== 4 ====
-    columns_images_tags_vals_4 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
-    datasets_counts_4 = []
-    # =========================================================================================== 5 ====
-    columns_objects_tags_5 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
-    datasets_counts_5 = []
-    # =========================================================================================== 6 ====
-    columns_objects_tags_6 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
-    datasets_counts_6 = []
-    # =========================================================================================== 7 ====
-    columns_objects_tags_7 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
-    datasets_counts_7 = []
-    obj_tags_to_vals = defaultdict(list)
-    # =========================================================================================== 8 ====
-    columns_objects_tags_vals_8 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
-    datasets_counts_8 = []
-    # =========================================================================================== 9 ====
-    columns_images_urls_to_img_tags_9 = [FIRST_STRING, IMAGE_COL, DATASET_NAME, TAG_COLOMN, TAG_VALUE_COLOMN]
-    datasets_counts_9 = []
-    # =========================================================================================== 10 ====
-    columns_images_urls_to_obj_tags_10 = [FIRST_STRING, IMAGE_COL, DATASET_NAME, TAG_COLOMN, TAG_VALUE_COLOMN, NUM_OBJECTS]
-    datasets_counts_10 = []
-    # =========================================================================================== 11 ====
-    columns_objects_tags_11 = [FIRST_STRING, TAG_COLOMN, OBJECT_CLASS, PROJECT_COL]
-    datasets_counts_11 = []
-    # =========================================================================================== 12 ====
-    columns_objects_tags_12 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, OBJECT_CLASS, PROJECT_COL]
-    datasets_counts_12 = []
-
-
-    id_to_tagmeta = meta.tag_metas.get_id_mapping()
-
-    for dataset in api.dataset.get_list(PROJECT_ID):
-        columns_images_tags_1.extend([dataset.name])                            # 1
-        ds_images_tags_1 = defaultdict(int)                                     # 1
-
-        columns_images_tags_2.extend([dataset.name])                            # 2
-        ds_tags_to_imgs_urls_2 = defaultdict(list)                              # 2
-
-        columns_images_tags_3.extend([dataset.name])                            # 3
-        ds_images_tags_vals_3 = defaultdict(lambda: defaultdict(int))           # 3
-
-        columns_images_tags_vals_4.extend([dataset.name])                       # 4
-        ds_tags_to_imgs_urls_4 = defaultdict(lambda: defaultdict(list))         # 4
-
-        columns_objects_tags_5.extend([dataset.name])                           # 5
-        ds_objects_tags_5 = defaultdict(int)                                    # 5
-
-        columns_objects_tags_6.extend([dataset.name])                           # 6
-        ds_obj_tags_to_imgs_urls_6 = defaultdict(lambda: defaultdict(int))      # 6
-
-        columns_objects_tags_7.extend([dataset.name])                           # 7
-        ds_objects_tags_vals_7 = defaultdict(lambda: defaultdict(int))          # 7
-
-        columns_objects_tags_vals_8.extend([dataset.name])                      # 8
-        ds_tags_to_imgs_urls_8 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))         # 8
-
-        imgs_urls_to_img_tags_9 = defaultdict(lambda: defaultdict(list))                            # 9
-        imgs_urls_to_obj_tags_10 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))       # 10
-
-        columns_objects_tags_11.extend([dataset.name])                                              # 11
-        obj_tags_to_class_11 = defaultdict(lambda: defaultdict(int))                                # 11
-
-        columns_objects_tags_12.extend([dataset.name])                                              # 12
-        obj_tags_to_class_12 = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))           # 12
-
-        images = api.image.get_list(dataset.id)
-
-        for batch in sly.batched(images, batch_size=10):
-            image_ids = []
-            for image_info in batch:
-                image_ids.append(image_info.id)
-                curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
-                process_images_tags_1(curr_image_tags, ds_images_tags_1)                            # 1
-                #url = api.image.url(TEAM_ID, WORKSPACE_ID, PROJECT_ID, dataset.id, image_info.id)
-                process_images_tags_2(curr_image_tags, image_info, ds_tags_to_imgs_urls_2)          # 2
-                process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals)         # 3
-                process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4)          # 4
-                process_images_urls_to_img_tags_9(curr_image_tags, image_info, imgs_urls_to_img_tags_9)  # 9
-
-            ann_infos = api.annotation.download_batch(dataset.id, image_ids)
-
-            for idx, ann_info in enumerate(ann_infos):
-                ann = sly.Annotation.from_json(ann_info.annotation, meta)
-                curr_object_tags = get_objects_tags(ann)
-                process_objects_tags_5(curr_object_tags, ds_objects_tags_5)                          # 5
-                process_objects_tags_6(curr_object_tags, batch[idx], ds_obj_tags_to_imgs_urls_6)     # 6
-                process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals)   # 7
-                process_objects_tags_8(curr_object_tags, batch[idx], ds_tags_to_imgs_urls_8)         # 8
-                process_images_urls_to_obj_tags_10(curr_object_tags, batch[idx], imgs_urls_to_obj_tags_10)  # 10
-
-                process_obj_tags_to_class_11(ann, obj_tags_to_class_11)                              # 11
-                process_obj_tags_to_class_12(ann, obj_tags_to_class_12)                              # 12
-
-        datasets_counts_1.append((dataset.name, ds_images_tags_1))                       # 1
-        datasets_counts_2.append((dataset.name, ds_tags_to_imgs_urls_2))                 # 2
-        datasets_counts_3.append((dataset.name, ds_images_tags_vals_3))                  # 3
-        datasets_counts_4.append((dataset.name, ds_tags_to_imgs_urls_4))                 # 4
-        datasets_counts_5.append((dataset.name, ds_objects_tags_5))                      # 5
-        datasets_counts_6.append((dataset.name, ds_obj_tags_to_imgs_urls_6))             # 6
-        datasets_counts_7.append((dataset.name, ds_objects_tags_vals_7))                 # 7
-        datasets_counts_8.append((dataset.name, ds_tags_to_imgs_urls_8))                 # 8
-        datasets_counts_9.append((dataset.name, imgs_urls_to_img_tags_9))                # 9
-        datasets_counts_10.append((dataset.name, imgs_urls_to_obj_tags_10))              # 10
-        datasets_counts_11.append((dataset.name, obj_tags_to_class_11))                  # 11
-        datasets_counts_12.append((dataset.name, obj_tags_to_class_12))                  # 12
-
-    df_1 = get_pd_tag_stat_1(meta, datasets_counts_1, columns_images_tags_1)                       # 1
-    print(df_1)                                                                                    # 1
-
-    df_2 = get_pd_tag_stat_2(meta, datasets_counts_2, columns_images_tags_2)                       # 2
-    print(df_2)                                                                                    # 2
-
-    df_3 = get_pd_tag_stat_3(datasets_counts_3, columns_images_tags_3, tags_to_vals)               # 3
-    print(df_3)                                                                                    # 3
-
-    df_4 = get_pd_tag_stat_4(datasets_counts_4, columns_images_tags_vals_4, tags_to_vals)          # 4
-    print(df_4)                                                                                    # 4
-
-    df_5 = get_pd_tag_stat_5(meta, datasets_counts_5, columns_objects_tags_5)                      # 5
-    print(df_5)
-
-    df_6 = get_pd_tag_stat_6(meta, datasets_counts_6, columns_objects_tags_6)                      # 6
-    print(df_6)
-
-    df_7 = get_pd_tag_stat_7(datasets_counts_7, columns_objects_tags_7, obj_tags_to_vals)          # 7
-    print(df_7)
-
-    df_8 = get_pd_tag_stat_8(datasets_counts_8, columns_objects_tags_vals_8, obj_tags_to_vals)     # 8
-    print(df_8)
-
-    df_9 = get_pd_tag_stat_9(datasets_counts_9, columns_images_urls_to_img_tags_9)                 # 9
-    print(df_9)
-
-    df_10 = get_pd_tag_stat_10(datasets_counts_10, columns_images_urls_to_obj_tags_10)             # 10
-    print(df_10)
-
-    df_11 = get_pd_tag_stat_11(meta, datasets_counts_11, columns_objects_tags_11)                  # 11
-    print(df_11)
-
-    df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals) # 12
-    print(df_12)
-
-
-    report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
-    local_path = os.path.join(my_app.data_dir, report_name)
-    sly.fs.ensure_base_path(local_path)
-    with open(local_path, "w") as text_file:
-        print(my_app.app_url, file=text_file)
-    remote_path = "/reports/images_tags_stat/{}".format(report_name)
-    remote_path = api.file.get_free_name(TEAM_ID, remote_path)
-    report_name = sly.fs.get_file_name_with_ext(remote_path)
-    file_info = api.file.upload(TEAM_ID, local_path, remote_path)
-    report_url = api.file.get_url(file_info.id)
-
-    fields = [
-        {"field": "data.loading", "payload": False},
-        {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
-        {"field": "data.tags_to_imgs_urls_statTable", "payload": json.loads(df_2.to_json(orient="split"))},
-        {"field": "data.imgs_tags_vals_statTable", "payload": json.loads(df_3.to_json(orient="split"))},
-        {"field": "data.tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_4.to_json(orient="split"))},
-        {"field": "data.objs_tags_statTable", "payload": json.loads(df_5.to_json(orient="split"))},
-        {"field": "data.obj_tags_to_imgs_urls_statTable", "payload": json.loads(df_6.to_json(orient="split"))},
-        {"field": "data.objs_tags_vals_statTable", "payload": json.loads(df_7.to_json(orient="split"))},
-        {"field": "data.obj_tags_vals_to_imgs_urls_statTable", "payload": json.loads(df_8.to_json(orient="split"))},
-        {"field": "data.images_to_imgs_tag_val_statTable", "payload": json.loads(df_9.to_json(orient="split"))},
-        {"field": "data.images_to_objs_tag_val_statTable", "payload": json.loads(df_10.to_json(orient="split"))},
-        {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))},
-        {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))},
-        {"field": "data.savePath", "payload": remote_path},
-        {"field": "data.reportName", "payload": report_name},
-        {"field": "data.reportUrl", "payload": report_url},
-    ]
-
-    api.task.set_fields(task_id, fields)
-    api.task.set_output_report(task_id, file_info.id, report_name)
-    my_app.stop()
-    '''
 
 def main():
     sly.logger.info("Script arguments", extra={
