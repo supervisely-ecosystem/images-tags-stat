@@ -551,7 +551,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
     table_12 = {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))}
 
-    
+    app_logger.warn("{}".format(state))
+
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
     sly.fs.ensure_base_path(local_path)
