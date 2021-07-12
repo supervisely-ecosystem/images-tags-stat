@@ -189,10 +189,11 @@
     <sly-card
             class="mt15"
             title="Objects tags to classes"
+            v-if="state.noObjects"
             subtitle="Objects tags to classes"
             :options="{collapsable: false}"
             :collapsed.sync="state.ObjTagsNoExist"
-            :disabled="{disabled: state.ObjTagsNoExist, message: 'There is no object tags in project'}"
+            :disabled="{disabled: state.ObjTagsNoExist, message: 'You have not select any object tag'}"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -205,6 +206,7 @@
     <sly-card
             class="mt15"
             title="Objects tags vals to classes"
+            v-if="state.noObjects"
             subtitle="Objects tags vals to classes"
             :options="{collapsable: false}"
             :collapsed.sync="state.ObjTagsNoExist"
