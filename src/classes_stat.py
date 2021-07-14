@@ -535,19 +535,6 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals)  # 12
     print(df_12)                                                                                     # 12
 
-    if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
-        app_logger.warn("1")
-        table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
-    elif len(objects_tags) == 0:
-        app_logger.warn("2")
-        table_11 = {"field": "state.noObjects", "payload": False}
-        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
-    else:
-        app_logger.warn("3")
-        table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
-        table_12 = {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))}
-
     report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
     local_path = os.path.join(my_app.data_dir, report_name)
     sly.fs.ensure_base_path(local_path)
@@ -555,11 +542,26 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         print(my_app.app_url, file=text_file)
     remote_path = "/reports/images_tags_stat/{}".format(report_name)
     api.file.remove(TEAM_ID, remote_path)
-    #remote_path = api.file.get_free_name(TEAM_ID, remote_path)
+    # remote_path = api.file.get_free_name(TEAM_ID, remote_path)
     report_name = sly.fs.get_file_name_with_ext(remote_path)
     file_info = api.file.upload(TEAM_ID, local_path, remote_path)
     report_url = api.file.get_url(file_info.id)
 
+    table_13 = {}
+    table_14 = {}
+
+    if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
+        table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
+    elif len(objects_tags) == 0:
+        table_11 = {"field": "state.noObjects", "payload": False}
+        table_12 = {"field": "state.noObjectsAndVals", "payload": False}
+    else:
+        table_11 = {"field": "data.obj_tags_to_classes_statTable", "payload": json.loads(df_11.to_json(orient="split"))}
+        table_12 = {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))}
+        table_13 = {"field": "state.ObjTagsNoExist", "payload": False}
+        table_14 = {"field": "state.noObjectsAndVals", "payload": True}
+        
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
@@ -580,6 +582,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
+        table_13,
+        table_14
     ]
 
     api.task.set_fields(task_id, fields)
