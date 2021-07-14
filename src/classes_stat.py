@@ -394,27 +394,27 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     columns_images_tags_1 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
     datasets_counts_1 = []
     # ========================================================================================== 2 ====
-    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
+    columns_images_tags_2 = [FIRST_STRING, TAG_COLOMN, IMAGE_COL]
     datasets_counts_2 = []
     # ========================================================================================== 3 ====
     columns_images_tags_3 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
     datasets_counts_3 = []
     tags_to_vals = defaultdict(list)
     # =========================================================================================== 4 ====
-    columns_images_tags_vals_4 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
+    columns_images_tags_vals_4 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, IMAGE_COL]
     datasets_counts_4 = []
     # =========================================================================================== 5 ====
     columns_objects_tags_5 = [FIRST_STRING, TAG_COLOMN, TOTAL_COL]
     datasets_counts_5 = []
     # =========================================================================================== 6 ====
-    columns_objects_tags_6 = [FIRST_STRING, TAG_COLOMN, PROJECT_COL]
+    columns_objects_tags_6 = [FIRST_STRING, TAG_COLOMN, IMAGE_COL]
     datasets_counts_6 = []
     # =========================================================================================== 7 ====
     columns_objects_tags_7 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, TOTAL_COL]
     datasets_counts_7 = []
     obj_tags_to_vals = defaultdict(list)
     # =========================================================================================== 8 ====
-    columns_objects_tags_vals_8 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, PROJECT_COL]
+    columns_objects_tags_vals_8 = [FIRST_STRING, TAG_COLOMN, TAG_VALUE_COLOMN, IMAGE_COL]
     datasets_counts_8 = []
 
     # =========================================================================================== 9 ====
