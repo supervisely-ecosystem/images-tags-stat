@@ -549,6 +549,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
 
     table_13 = {}
     table_14 = {}
+    update_tables = False
 
     if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
         table_11 = {"field": "state.ObjTagsNoExist", "payload": True}
@@ -561,7 +562,8 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         table_12 = {"field": "data.obj_tags_vals_to_classes_statTable", "payload": json.loads(df_12.to_json(orient="split"))}
         table_13 = {"field": "state.ObjTagsNoExist", "payload": False}
         table_14 = {"field": "state.noObjectsAndVals", "payload": True}
-        
+        update_tables = True
+
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": json.loads(df_1.to_json(orient="split"))},
@@ -582,9 +584,10 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.savePath", "payload": remote_path},
         {"field": "data.reportName", "payload": report_name},
         {"field": "data.reportUrl", "payload": report_url},
-        table_13,
-        table_14
     ]
+
+    if update_tables:
+        fields.append(table_13, table_14)
 
     api.task.set_fields(task_id, fields)
 
