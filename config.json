@@ -1,10 +1,10 @@
 {
-  "name": "Images tags stat",
+  "name": "Tags statistics in images project",
   "type": "app",
   "categories": [
     "Report"
   ],
-  "description": "Get stat about tags in images project",
+  "description": "Get tags statistics in images project",
   "docker_image": "supervisely/base-py-sdk:6",
   "main_script": "src/classes_stat.py",
   "gui_template": "src/gui.html",

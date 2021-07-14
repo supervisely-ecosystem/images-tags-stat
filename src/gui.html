@@ -2,7 +2,7 @@
 
     <sly-card
             class="mt15"
-            title="Select images and objects tags and values"
+            title="Select images and(or) objects tags and values"
     >
 
           <el-select v-model="state.choose_tags" multiple placeholder="Select images tags" @change="command('choose_tags_values');">
@@ -58,8 +58,7 @@
 
     <sly-card
             class="mt15"
-            title="Images tags stats"
-            subtitle="Images tags stats"
+            title="Images tags statistics"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -71,8 +70,7 @@
 
     <sly-card
             class="mt15"
-            title="Images tags stats to imgs"
-            subtitle="Images tags stats to imgs"
+            title="Matching tags to images"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -84,8 +82,7 @@
 
     <sly-card
             class="mt15"
-            title="Images tags vals stats"
-            subtitle="Images tags vals stats"
+            title="Images tags values statistics"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -97,8 +94,7 @@
 
     <sly-card
             class="mt15"
-            title="Images tags values stats to imgs"
-            subtitle="Images tags values stats to imgs"
+            title="Matching tags values to images"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -110,8 +106,7 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags stats"
-            subtitle="Objects tags stats"
+            title="Objects tags statistics"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -123,8 +118,7 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags stats to imgs"
-            subtitle="Objects tags stats to imgs"
+            title="Matching objects tags statistics to images"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -136,8 +130,7 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags vals stats"
-            subtitle="Objects tags vals stats"
+            title="Objects tags values statistics"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -149,8 +142,7 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags values stats to imgs"
-            subtitle="Objects tags values stats to imgs"
+            title="Matching objects tags values statistics to images"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -162,8 +154,7 @@
 
     <sly-card
             class="mt15"
-            title="Images to imgs tags and values"
-            subtitle="Images to imgs tags and values"
+            title="Matching images to images tags and values"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -175,8 +166,7 @@
 
     <sly-card
             class="mt15"
-            title="Images to obj tags and values"
-            subtitle="Images to obj tags and values"
+            title="Matching images to objects tags and values, number of objects with tag value in image"
     >
         <sly-table
                 v-loading="data.imgs_tags_stat"
@@ -188,9 +178,8 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags to classes"
+            title="Objects tags to project classes"
             v-if="state.noObjects"
-            subtitle="Objects tags to classes"
             :options="{collapsable: false}"
             :collapsed.sync="state.ObjTagsNoExist"
             :disabled="{disabled: state.ObjTagsNoExist, message: 'You have not select any object tag'}"
@@ -205,9 +194,8 @@
 
     <sly-card
             class="mt15"
-            title="Objects tags vals to classes"
+            title="Objects tags values to project classes"
             v-if="state.noObjectsAndVals"
-            subtitle="Objects tags vals to classes"
             :options="{collapsable: false}"
             :collapsed.sync="state.ObjTagsNoExist"
             :disabled="{disabled: state.ObjTagsNoExist}"
