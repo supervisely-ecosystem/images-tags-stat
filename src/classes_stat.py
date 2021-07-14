@@ -587,7 +587,7 @@ def my_test_select(api: sly.Api, task_id, context, state, app_logger):
     ]
 
     if update_tables:
-        fields.append(table_13, table_14)
+        fields.extend([table_13, table_14])
 
     api.task.set_fields(task_id, fields)
 
