@@ -251,7 +251,7 @@ def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8,
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
-            if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']):
+            if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']) == 0:
                 ds_tags_to_imgs_urls_8[tag.name][tag.value][link] += 1
 
 
@@ -352,7 +352,7 @@ def process_obj_tags_to_class_12(ann, obj_tags_to_class_12, state):
     for label in ann.labels:
         for tag in label.tags:
             if tag.name in state['choose_objs_tags']:
-                if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']):
+                if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']) == 0:
                     obj_tags_to_class_12[tag.name][tag.value][label.obj_class.name] += 1
 
 
