@@ -214,6 +214,7 @@ def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to
 
     curr_objs_vals = defaultdict(list)
     for item in state['choose_objs_vals']:
+        logger.warn('{}'.format(item))
         tag_name = item.split(' ')[1]
         tag_val = item.split(' ')[0]
         curr_objs_vals[tag_name].append(tag_val)
