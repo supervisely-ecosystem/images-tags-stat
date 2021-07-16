@@ -593,7 +593,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
                 curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
                 for curr_tag in curr_image_tags:
                     if curr_tag.name in state['choose_tags']:
-                        if curr_tag.value not in tags_to_values[curr_tag.name]:
+                        if curr_tag.value not in tags_to_values[curr_tag.name] and curr_tag.value is not None:
                             tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
@@ -648,7 +648,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
                 curr_object_tags = get_objects_tags(ann)
                 for curr_tag in curr_object_tags:
                     if curr_tag.name in state['choose_objs_tags']:
-                        if curr_tag.value not in tags_to_values[curr_tag.name]:
+                        if curr_tag.value not in tags_to_values[curr_tag.name] and curr_tag.value is not None:
                             tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
