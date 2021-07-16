@@ -29,19 +29,32 @@ FIRST_STRING = '#'
 logger = my_app.logger
 objects_tags = []
 
-tags_to_values = defaultdict(list)
+images_tags_to_values = defaultdict(list)
+objects_tags_to_values = defaultdict(list)
 
 
-def get_tags_vals(state_vals):
-    logger.warn('{}'.format(state_vals))
-    logger.warn('tags_to_values: {}'.format(tags_to_values))
+def get_images_tags_vals(state_vals):
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
         tag_name = item.split(' ')[1]
         tag_val = item.split(' ')[0]
         curr_objs_vals[tag_name].append(tag_val)
 
-    for tag, val in tags_to_values.items():
+    for tag, val in images_tags_to_values.items():
+        if tag not in curr_objs_vals.keys():
+            curr_objs_vals[tag].extend(val)
+
+    return curr_objs_vals
+
+
+def get_objects_tags_vals(state_vals):
+    curr_objs_vals = defaultdict(list)
+    for item in state_vals:
+        tag_name = item.split(' ')[1]
+        tag_val = item.split(' ')[0]
+        curr_objs_vals[tag_name].append(tag_val)
+
+    for tag, val in objects_tags_to_values.items():
         if tag not in curr_objs_vals.keys():
             curr_objs_vals[tag].extend(val)
 
@@ -100,7 +113,7 @@ def get_pd_tag_stat_2(datasets, columns, state):
 
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
-    curr_objs_vals = get_tags_vals(state['choose_vals'])
+    curr_objs_vals = get_images_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
@@ -139,7 +152,7 @@ def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
 
 
 def process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4, state):
-    curr_objs_vals = get_tags_vals(state['choose_vals'])
+    curr_objs_vals = get_images_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
@@ -230,7 +243,7 @@ def get_pd_tag_stat_6(datasets, columns, state):
 
 def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state):
 
-    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
+    curr_objs_vals = get_objects_tags_vals(state['choose_objs_vals'])
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
@@ -269,7 +282,7 @@ def get_pd_tag_stat_7(datasets, columns, obj_tags_to_vals):
 
 def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8, state):
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
-    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
+    curr_objs_vals = get_objects_tags_vals(state['choose_objs_vals'])
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
@@ -370,7 +383,7 @@ def get_pd_tag_stat_11(meta, datasets, columns, state):
 
 
 def process_obj_tags_to_class_12(ann, obj_tags_to_class_12, state):
-    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
+    curr_objs_vals = get_objects_tags_vals(state['choose_objs_vals'])
     for label in ann.labels:
         for tag in label.tags:
             if tag.name in state['choose_objs_tags']:
@@ -612,14 +625,14 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
                 curr_image_tags = sly.TagCollection.from_api_response(image_info.tags, meta.tag_metas, id_to_tagmeta)
                 for curr_tag in curr_image_tags:
                     if curr_tag.name in state['choose_tags']:
-                        if curr_tag.value not in tags_to_values[curr_tag.name] and curr_tag.value is not None:
-                            tags_to_values[curr_tag.name].append(curr_tag.value)
+                        if curr_tag.value not in images_tags_to_values[curr_tag.name] and curr_tag.value is not None:
+                            images_tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
 
-    for tag_name in tags_to_values:
+    for tag_name in images_tags_to_values:
         options_data = []
-        for tag_val in tags_to_values[tag_name]:
+        for tag_val in images_tags_to_values[tag_name]:
             options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
@@ -650,8 +663,6 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
 
-    tags_to_values = defaultdict(list)
-
     for dataset in api.dataset.get_list(PROJECT_ID):
         images = api.image.get_list(dataset.id)
         for batch in sly.batched(images, batch_size=10):
@@ -665,14 +676,14 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
                 curr_object_tags = get_objects_tags(ann)
                 for curr_tag in curr_object_tags:
                     if curr_tag.name in state['choose_objs_tags']:
-                        if curr_tag.value not in tags_to_values[curr_tag.name] and curr_tag.value is not None:
-                            tags_to_values[curr_tag.name].append(curr_tag.value)
+                        if curr_tag.value not in objects_tags_to_values[curr_tag.name] and curr_tag.value is not None:
+                            objects_tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
 
-    for tag_name in tags_to_values:
+    for tag_name in objects_tags_to_values:
         options_data = []
-        for tag_val in tags_to_values[tag_name]:
+        for tag_val in objects_tags_to_values[tag_name]:
             options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
