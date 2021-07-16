@@ -211,10 +211,17 @@ def get_pd_tag_stat_6(datasets, columns, state):
 
 
 def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state):
+
+    curr_objs_vals = defaultdict(list)
+    for item in state['choose_objs_vals']:
+        tag_name = item.split(' ')[1]
+        tag_val = item.split(' ')[0]
+        curr_objs_vals[tag_name].append(tag_val)
+
     state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
-            if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']) == 0:
+            if len(curr_objs_vals[tag.name]) != 0 or len(state['choose_objs_vals']) == 0:
                 if tag.value not in obj_tags_to_vals[tag.name]:
                     obj_tags_to_vals[tag.name].append(tag.value)
                 ds_objects_tags_vals_7[tag.name][tag.value] += 1
