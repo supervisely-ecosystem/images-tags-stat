@@ -33,7 +33,6 @@ objects_tags = []
 def get_tags_vals(state_vals):
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
-        logger.warn('{}'.format(item))
         tag_name = item.split(' ')[1]
         tag_val = item.split(' ')[0]
         curr_objs_vals[tag_name].append(tag_val)
@@ -93,7 +92,6 @@ def get_pd_tag_stat_2(datasets, columns, state):
 
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
-    #state['choose_vals'].append(None)
     curr_objs_vals = get_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
@@ -133,7 +131,6 @@ def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
 
 
 def process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4, state):
-    #state['choose_vals'].append(None)
     curr_objs_vals = get_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
@@ -226,7 +223,6 @@ def get_pd_tag_stat_6(datasets, columns, state):
 def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state):
 
     curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
-    #state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
@@ -264,7 +260,6 @@ def get_pd_tag_stat_7(datasets, columns, obj_tags_to_vals):
 
 
 def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8, state):
-    #state['choose_objs_vals'].append(None)
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
     curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
     for tag in curr_object_tags:
@@ -367,7 +362,6 @@ def get_pd_tag_stat_11(meta, datasets, columns, state):
 
 
 def process_obj_tags_to_class_12(ann, obj_tags_to_class_12, state):
-    #state['choose_objs_vals'].append(None)
     curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
     for label in ann.labels:
         for tag in label.tags:
@@ -402,9 +396,6 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 @my_app.callback("get_statistics")
 @sly.timeit
 def get_statistics(api: sly.Api, task_id, context, state, app_logger):
-
-    #if 'None' in state['choose_vals']:
-    #    state['choose_vals'].append(None)
 
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
