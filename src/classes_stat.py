@@ -34,6 +34,9 @@ objects_tags_to_values = defaultdict(list)
 
 
 def get_images_tags_vals(state_vals):
+
+    logger.warn('{}'.format(state_vals))
+
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
         tag_name = item.split(' ')[1]
@@ -113,7 +116,14 @@ def get_pd_tag_stat_2(datasets, columns, state):
 
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
+
+    logger.warn('tags_to_vals {}'.format(tags_to_vals))
+
     curr_objs_vals = get_images_tags_vals(state['choose_vals'])
+
+    logger.warn('curr_objs_vals {}'.format(curr_objs_vals))
+
+    
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
