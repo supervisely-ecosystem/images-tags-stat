@@ -37,6 +37,7 @@ def get_images_tags_vals(state_vals):
 
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
+        logger.warn('{}'.format(item))
         tag_val, tag_name, tag_type = item.split(' ')
         if tag_type == 'int':
             tag_val = int(tag_val)
