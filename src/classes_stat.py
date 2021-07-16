@@ -212,7 +212,10 @@ def get_pd_tag_stat_6(datasets, columns, state):
 
 def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state):
 
+    logger.warn('{}'.format(state['choose_objs_vals']))
+
     curr_objs_vals = defaultdict(list)
+    
     for item in state['choose_objs_vals']:
         logger.warn('{}'.format(item))
         tag_name = item.split(' ')[1]
@@ -393,8 +396,6 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 @my_app.callback("get_statistics")
 @sly.timeit
 def get_statistics(api: sly.Api, task_id, context, state, app_logger):
-
-    logger.warn('{}'.format(state))
 
     #if 'None' in state['choose_vals']:
     #    state['choose_vals'].append(None)
