@@ -93,10 +93,11 @@ def get_pd_tag_stat_2(datasets, columns, state):
 
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
-    state['choose_vals'].append(None)
+    #state['choose_vals'].append(None)
+    curr_objs_vals = get_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
-            if tag.value in state['choose_vals'] or len(state['choose_vals']) == 0:
+            if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
                 if tag.value not in tags_to_vals[tag.name]:
                     tags_to_vals[tag.name].append(tag.value)
                 ds_images_tags_vals_3[tag.name][tag.value] += 1
@@ -132,10 +133,11 @@ def get_pd_tag_stat_3(datasets, columns, tags_to_vals):
 
 
 def process_images_tags_4(curr_image_tags, image_info, ds_tags_to_imgs_urls_4, state):
-    state['choose_vals'].append(None)
+    #state['choose_vals'].append(None)
+    curr_objs_vals = get_tags_vals(state['choose_vals'])
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
-            if tag.value in state['choose_vals'] or len(state['choose_vals']) == 0:
+            if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
                 ds_tags_to_imgs_urls_4[tag.name][tag.value].append('<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'
                                                       .format(image_info.full_storage_url, image_info.name))
 
@@ -223,10 +225,7 @@ def get_pd_tag_stat_6(datasets, columns, state):
 
 def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to_vals, state):
 
-    logger.warn('{}'.format(state['choose_objs_vals']))
-
     curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
-
     #state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
