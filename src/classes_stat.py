@@ -31,6 +31,7 @@ objects_tags = []
 
 
 def get_tags_vals(state_vals):
+    logger.warn('{}'.format(state_vals))
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
         tag_name = item.split(' ')[1]
