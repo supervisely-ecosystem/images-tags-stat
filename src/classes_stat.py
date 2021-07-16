@@ -659,7 +659,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in tags_to_values:
         options_data = []
         for tag_val in tags_to_values[tag_name]:
-            options_data.append({"value": tag_val, "label":tag_val + ' ' + tag_name})
+            options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
