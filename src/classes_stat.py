@@ -369,10 +369,11 @@ def get_pd_tag_stat_11(meta, datasets, columns, state):
 
 def process_obj_tags_to_class_12(ann, obj_tags_to_class_12, state):
     #state['choose_objs_vals'].append(None)
+    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
     for label in ann.labels:
         for tag in label.tags:
             if tag.name in state['choose_objs_tags']:
-                if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']) == 0:
+                if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
                     obj_tags_to_class_12[tag.name][tag.value][label.obj_class.name] += 1
 
 
