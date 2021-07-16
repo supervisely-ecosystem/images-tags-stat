@@ -35,12 +35,13 @@ objects_tags_to_values = defaultdict(list)
 
 def get_images_tags_vals(state_vals):
 
-    logger.warn('{}'.format(state_vals))
-
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
-        tag_name = item.split(' ')[1]
-        tag_val = item.split(' ')[0]
+        tag_val, tag_name, tag_type = item.split(' ')
+        if tag_type == 'int':
+            tag_val = int(tag_val)
+        elif tag_type == 'float':
+            tag_val = float(tag_val)
         curr_objs_vals[tag_name].append(tag_val)
 
     for tag, val in images_tags_to_values.items():
@@ -51,10 +52,14 @@ def get_images_tags_vals(state_vals):
 
 
 def get_objects_tags_vals(state_vals):
+
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
-        tag_name = item.split(' ')[1]
-        tag_val = item.split(' ')[0]
+        tag_val, tag_name, tag_type = item.split(' ')
+        if tag_type == 'int':
+            tag_val = int(tag_val)
+        elif tag_type == 'float':
+            tag_val = float(tag_val)
         curr_objs_vals[tag_name].append(tag_val)
 
     for tag, val in objects_tags_to_values.items():
@@ -117,13 +122,8 @@ def get_pd_tag_stat_2(datasets, columns, state):
 
 def process_images_tags_3(curr_image_tags, ds_images_tags_vals_3, tags_to_vals, state):
 
-    logger.warn('tags_to_vals {}'.format(tags_to_vals))
-
     curr_objs_vals = get_images_tags_vals(state['choose_vals'])
 
-    logger.warn('curr_objs_vals {}'.format(curr_objs_vals))
-
-    
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
             if tag.value in curr_objs_vals[tag.name] or len(state['choose_vals']) == 0:
@@ -643,7 +643,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in images_tags_to_values:
         options_data = []
         for tag_val in images_tags_to_values[tag_name]:
-            options_data.append({"value": str(tag_val) + ' ' + tag_name, "label":tag_val})
+            options_data.append({"value": str(tag_val) + ' ' + tag_name + ' ' + type(tag_val), "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
@@ -694,7 +694,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in objects_tags_to_values:
         options_data = []
         for tag_val in objects_tags_to_values[tag_name]:
-            options_data.append({"value": str(tag_val) + ' ' + tag_name, "label":tag_val})
+            options_data.append({"value": str(tag_val) + ' ' + tag_name + ' ' + type(tag_val), "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
