@@ -565,6 +565,18 @@ def get_statistics(api: sly.Api, task_id, context, state, app_logger):
     df_12 = get_pd_tag_stat_12(meta, datasets_counts_12, columns_objects_tags_12, obj_tags_to_vals)  # 12
     print(df_12)                                                                                     # 12
 
+    report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
+    local_path = os.path.join(my_app.data_dir, report_name)
+    sly.fs.ensure_base_path(local_path)
+    with open(local_path, "w") as text_file:
+        print(my_app.app_url, file=text_file)
+    remote_path = "/reports/images_tags_stat/{}".format(report_name)
+    api.file.remove(TEAM_ID, remote_path)
+    # remote_path = api.file.get_free_name(TEAM_ID, remote_path)
+    report_name = sly.fs.get_file_name_with_ext(remote_path)
+    file_info = api.file.upload(TEAM_ID, local_path, remote_path)
+    report_url = api.file.get_url(file_info.id)
+
     update_tables = False
 
     if len(objects_tags) != 0 and len(state['choose_objs_tags']) == 0:
@@ -594,12 +606,16 @@ def get_statistics(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.images_to_objs_tag_val_statTable", "payload": json.loads(df_10.to_json(orient="split"))},
         table_11,
         table_12,
+        {"field": "data.savePath", "payload": remote_path},
+        {"field": "data.reportName", "payload": report_name},
+        {"field": "data.reportUrl", "payload": report_url},
     ]
 
     if update_tables:
         fields.extend([table_13, table_14])
 
     api.task.set_fields(task_id, fields)
+    api.task.set_output_report(task_id, file_info.id, report_name)
 
 
 @my_app.callback("choose_tags_values")
@@ -717,18 +733,6 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         if tag.applicable_to != TagApplicableTo.IMAGES_ONLY:
             objects_tags.append({"value": tag.name, "label": tag.name})
 
-    report_name = "{}_{}.lnk".format(PROJECT_ID, project_info.name)
-    local_path = os.path.join(my_app.data_dir, report_name)
-    sly.fs.ensure_base_path(local_path)
-    with open(local_path, "w") as text_file:
-        print(my_app.app_url, file=text_file)
-    remote_path = "/reports/images_tags_stat/{}".format(report_name)
-    api.file.remove(TEAM_ID, remote_path)
-    # remote_path = api.file.get_free_name(TEAM_ID, remote_path)
-    report_name = sly.fs.get_file_name_with_ext(remote_path)
-    file_info = api.file.upload(TEAM_ID, local_path, remote_path)
-    report_url = api.file.get_url(file_info.id)
-
     fields = [
         {"field": "data.loading", "payload": False},
         {"field": "data.imgs_tags_statTable", "payload": []},
@@ -744,13 +748,9 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_to_classes_statTable", "payload": []},
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": []},
         {"field": "state.options", "payload": images_tags},
-        {"field": "state.options_objs", "payload": objects_tags},
-        {"field": "data.savePath", "payload": remote_path},
-        {"field": "data.reportName", "payload": report_name},
-        {"field": "data.reportUrl", "payload": report_url},
+        {"field": "state.options_objs", "payload": objects_tags}
     ]
     api.task.set_fields(task_id, fields)
-    api.task.set_output_report(task_id, file_info.id, report_name)
 
 
 def main():
