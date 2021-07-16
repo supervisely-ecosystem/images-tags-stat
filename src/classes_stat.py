@@ -215,14 +215,14 @@ def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to
     logger.warn('{}'.format(state['choose_objs_vals']))
 
     curr_objs_vals = defaultdict(list)
-    
+
     for item in state['choose_objs_vals']:
         logger.warn('{}'.format(item))
         tag_name = item.split(' ')[1]
         tag_val = item.split(' ')[0]
         curr_objs_vals[tag_name].append(tag_val)
 
-    state['choose_objs_vals'].append(None)
+    #state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
             if len(curr_objs_vals[tag.name]) != 0 or len(state['choose_objs_vals']) == 0:
@@ -260,7 +260,7 @@ def get_pd_tag_stat_7(datasets, columns, obj_tags_to_vals):
 
 
 def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8, state):
-    state['choose_objs_vals'].append(None)
+    #state['choose_objs_vals'].append(None)
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
@@ -362,7 +362,7 @@ def get_pd_tag_stat_11(meta, datasets, columns, state):
 
 
 def process_obj_tags_to_class_12(ann, obj_tags_to_class_12, state):
-    state['choose_objs_vals'].append(None)
+    #state['choose_objs_vals'].append(None)
     for label in ann.labels:
         for tag in label.tags:
             if tag.name in state['choose_objs_tags']:
