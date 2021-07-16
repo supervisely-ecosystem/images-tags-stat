@@ -599,7 +599,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
                 for curr_tag in curr_image_tags:
                     if curr_tag.name in state['choose_tags']:
                         if curr_tag.value not in tags_to_values[curr_tag.name] and curr_tag.value is not None:
-                            tags_to_values[curr_tag.name].append(curr_tag.value)
+                            tags_to_values[curr_tag.name].append(curr_tag.value + '_' + curr_tag.name)
 
     select_data = []
 
