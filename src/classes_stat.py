@@ -386,6 +386,8 @@ def get_pd_tag_stat_12(meta, datasets, columns, obj_tags_to_vals):
 @sly.timeit
 def get_statistics(api: sly.Api, task_id, context, state, app_logger):
 
+    logger.warn('{}'.format(state))
+
     #if 'None' in state['choose_vals']:
     #    state['choose_vals'].append(None)
 
