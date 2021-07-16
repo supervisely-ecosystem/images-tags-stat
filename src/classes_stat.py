@@ -633,7 +633,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in images_tags_to_values:
         options_data = []
         for tag_val in images_tags_to_values[tag_name]:
-            options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
+            options_data.append({"value": str(tag_val) + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
@@ -684,7 +684,7 @@ def choose_objs_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in objects_tags_to_values:
         options_data = []
         for tag_val in objects_tags_to_values[tag_name]:
-            options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
+            options_data.append({"value": str(tag_val) + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
