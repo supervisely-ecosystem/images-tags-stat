@@ -30,6 +30,17 @@ logger = my_app.logger
 objects_tags = []
 
 
+def get_tags_vals(state_vals):
+    curr_objs_vals = defaultdict(list)
+    for item in state_vals:
+        logger.warn('{}'.format(item))
+        tag_name = item.split(' ')[1]
+        tag_val = item.split(' ')[0]
+        curr_objs_vals[tag_name].append(tag_val)
+
+    return curr_objs_vals
+
+
 def process_images_tags_1(curr_image_tags, ds_images_tags_1, state):
     for tag in curr_image_tags:
         if tag.name in state['choose_tags']:
@@ -214,13 +225,7 @@ def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to
 
     logger.warn('{}'.format(state['choose_objs_vals']))
 
-    curr_objs_vals = defaultdict(list)
-
-    for item in state['choose_objs_vals']:
-        logger.warn('{}'.format(item))
-        tag_name = item.split(' ')[1]
-        tag_val = item.split(' ')[0]
-        curr_objs_vals[tag_name].append(tag_val)
+    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
 
     #state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
@@ -262,9 +267,10 @@ def get_pd_tag_stat_7(datasets, columns, obj_tags_to_vals):
 def process_objects_tags_8(curr_object_tags, image_info, ds_tags_to_imgs_urls_8, state):
     #state['choose_objs_vals'].append(None)
     link = '<a href="{0}" rel="noopener noreferrer" target="_blank">{1}</a>'.format(image_info.full_storage_url, image_info.name)
+    curr_objs_vals = get_tags_vals(state['choose_objs_vals'])
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
-            if tag.value in state['choose_objs_vals'] or len(state['choose_objs_vals']) == 0:
+            if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
                 ds_tags_to_imgs_urls_8[tag.name][tag.value][link] += 1
 
 
@@ -617,7 +623,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     for tag_name in tags_to_values:
         options_data = []
         for tag_val in tags_to_values[tag_name]:
-            options_data.append({"value": tag_val, "label":tag_val})
+            options_data.append({"value": tag_val + ' ' + tag_name, "label":tag_val})
         select_data.append({"label": tag_name, "options":options_data})
 
     fields = [
