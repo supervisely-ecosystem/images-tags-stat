@@ -41,6 +41,10 @@ def get_tags_vals(state_vals):
         tag_val = item.split(' ')[0]
         curr_objs_vals[tag_name].append(tag_val)
 
+    for tag, val in tags_to_values.items():
+        if tag not in curr_objs_vals.keys():
+            curr_objs_vals[tag].extend(val)
+
     return curr_objs_vals
 
 
