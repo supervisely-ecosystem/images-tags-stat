@@ -615,7 +615,9 @@ def get_statistics(api: sly.Api, task_id, context, state, app_logger):
         fields.extend([table_13, table_14])
 
     api.task.set_fields(task_id, fields)
+
     api.task.set_output_report(task_id, file_info.id, report_name)
+    my_app.stop()
 
 
 @my_app.callback("choose_tags_values")
