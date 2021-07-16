@@ -29,9 +29,12 @@ FIRST_STRING = '#'
 logger = my_app.logger
 objects_tags = []
 
+tags_to_values = defaultdict(list)
+
 
 def get_tags_vals(state_vals):
     logger.warn('{}'.format(state_vals))
+    logger.warn('tags_to_values: {}'.format(tags_to_values))
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
         tag_name = item.split(' ')[1]
@@ -593,8 +596,6 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
-
-    tags_to_values = defaultdict(list)
 
     id_to_tagmeta = meta.tag_metas.get_id_mapping()
 
