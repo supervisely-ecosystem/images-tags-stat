@@ -748,7 +748,11 @@ def images_tags_stats(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_to_classes_statTable", "payload": []},
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": []},
         {"field": "state.options", "payload": images_tags},
-        {"field": "state.options_objs", "payload": objects_tags}
+        {"field": "state.options_objs", "payload": objects_tags},
+
+        {"field": "data.projectName", "payload": project_info.name},
+        {"field": "data.projectId", "payload": project_info.id},
+        {"field": "data.projectPreviewUrl", "payload": api.image.preview_url(project_info.reference_image_url, 100, 100)},
     ]
     api.task.set_fields(task_id, fields)
 
