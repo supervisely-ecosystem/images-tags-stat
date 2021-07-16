@@ -225,7 +225,7 @@ def process_objects_tags_7(curr_object_tags, ds_objects_tags_vals_7, obj_tags_to
     #state['choose_objs_vals'].append(None)
     for tag in curr_object_tags:
         if tag.name in state['choose_objs_tags']:
-            if len(curr_objs_vals[tag.name]) != 0 or len(state['choose_objs_vals']) == 0:
+            if tag.value in curr_objs_vals[tag.name] or len(state['choose_objs_vals']) == 0:
                 if tag.value not in obj_tags_to_vals[tag.name]:
                     obj_tags_to_vals[tag.name].append(tag.value)
                 ds_objects_tags_vals_7[tag.name][tag.value] += 1
