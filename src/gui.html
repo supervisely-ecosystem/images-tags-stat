@@ -29,7 +29,7 @@
             title="Select images and(or) objects tags and values"
     >
 
-          <el-select v-model="state.choose_tags" clearable multiple placeholder="Select images tags" @change="command('choose_tags_values');">
+          <el-select v-model="state.choose_tags" multiple placeholder="Select images tags" @change="command('choose_tags_values');">
             <el-option
               v-for="item in state.options"
               :key="item.value"
