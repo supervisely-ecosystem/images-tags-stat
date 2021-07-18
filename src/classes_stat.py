@@ -37,7 +37,6 @@ def get_images_tags_vals(state_vals):
 
     curr_objs_vals = defaultdict(list)
     for item in state_vals:
-        logger.warn('{}'.format(item))
         tag_val, tag_name, tag_type = item.split(' ')
         if tag_type == 'int':
             tag_val = int(tag_val)
@@ -641,6 +640,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
                             images_tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
+    logger.warn('1: {}'.format(select_data))
 
     for tag_name in images_tags_to_values:
         options_data = []
@@ -664,8 +664,8 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
-    
-    logger.warn('{}'.format(select_data))
+
+    logger.warn('2: {}'.format(select_data))
 
     api.task.set_fields(task_id, fields)
 
