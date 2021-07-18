@@ -664,6 +664,9 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
+    
+    logger.warn('{}'.format(select_data))
+
     api.task.set_fields(task_id, fields)
 
 
