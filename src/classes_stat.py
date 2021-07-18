@@ -621,6 +621,11 @@ def get_statistics(api: sly.Api, task_id, context, state, app_logger):
 @sly.timeit
 def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
 
+    global images_tags_to_values
+    logger.warn('global: {}'.format(images_tags_to_values))
+    images_tags_to_values = defaultdict(list)
+    logger.warn('local: {}'.format(images_tags_to_values))
+
     project_info = api.project.get_info_by_id(PROJECT_ID)
     meta_json = api.project.get_meta(project_info.id)
     meta = sly.ProjectMeta.from_json(meta_json)
@@ -640,7 +645,6 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
                             images_tags_to_values[curr_tag.name].append(curr_tag.value)
 
     select_data = []
-    logger.warn('1: {}'.format(select_data))
 
     for tag_name in images_tags_to_values:
         options_data = []
@@ -664,9 +668,7 @@ def choose_tags_values(api: sly.Api, task_id, context, state, app_logger):
         {"field": "data.obj_tags_vals_to_classes_statTable", "payload": []},
         {"field": "state.options3", "payload": select_data}
     ]
-
-    logger.warn('2: {}'.format(select_data))
-
+    
     api.task.set_fields(task_id, fields)
 
 
