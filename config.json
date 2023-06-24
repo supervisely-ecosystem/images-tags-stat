@@ -8,7 +8,6 @@
   "docker_image": "supervisely/base-py-sdk:6.35.0",
   "main_script": "src/classes_stat.py",
   "gui_template": "src/gui.html",
-  "modal_template": "src/modal.html",
   "modal_template_state": {},
   "task_location": "workspace_tasks",
   "icon": "https://i.imgur.com/dQbfTnd.png",
