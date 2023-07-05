@@ -10,7 +10,7 @@
   "gui_template": "src/gui.html",
   "modal_template_state": {},
   "task_location": "workspace_tasks",
-  "icon": "https://i.imgur.com/dQbfTnd.png",
+  "icon": "https://github.com/supervisely-ecosystem/images-tags-stat/assets/48245050/2448312d-b6e8-45dd-9205-508c4c9d4f2b",
   "icon_background": "#FFFFFF",
   "context_menu": {
     "target": [
