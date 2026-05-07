@@ -1,9 +1,9 @@
 import os
-import supervisely_lib as sly
+import supervisely as sly
 import pandas as pd
 import json
 from collections import defaultdict
-from supervisely_lib.annotation.tag_meta import TagApplicableTo
+from supervisely.annotation.tag_meta import TagApplicableTo
 
 my_app = sly.AppService()
 
